@@ -5,28 +5,21 @@ from zope.i18nmessageid import MessageFactory
 from zope.interface import Interface
 
 
-SITE_LAYOUT_RESOURCE_NAME = "sitelayout"
 CONTENT_LAYOUT_RESOURCE_NAME = 'contentlayout'
-
-SITE_LAYOUT_FILE_NAME = "site.html"
 CONTENT_LAYOUT_FILE_NAME = "content.html"
+DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY = 'plone.app.blocks.default_layout'
 
-SITE_LAYOUT_MANIFEST_FORMAT = ManifestFormat(
-    SITE_LAYOUT_RESOURCE_NAME,
-    keys=('title', 'description', 'file'),
-    defaults={'file': SITE_LAYOUT_FILE_NAME}
-)
 CONTENT_LAYOUT_MANIFEST_FORMAT = ManifestFormat(
     CONTENT_LAYOUT_RESOURCE_NAME,
     keys=('title', 'description', 'file', 'screenshot', 'for'),
     defaults={'file': CONTENT_LAYOUT_FILE_NAME}
 )
 
-DEFAULT_SITE_LAYOUT_REGISTRY_KEY = 'plone.defaultSiteLayout'
-DEFAULT_AJAX_LAYOUT_REGISTRY_KEY = 'plone.defaultAjaxLayout'
-
-DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY = 'plone.app.blocks.default_layout'
-
+# XXX
+# unused, b/w compat defs
+SITE_LAYOUT_RESOURCE_NAME = 'sitelayout'
+# end ununsed
+# XXX
 
 _ = MessageFactory('plone')
 
@@ -48,14 +41,6 @@ class IBlocksSettings(Interface):
     """Settings registered with the portal_registry tool
     """
 
-    esi = schema.Bool(
-        title=_(u"Enable Edge Side Includes"),
-        description=_(u"Allows tiles which support Edge Side Includes "
-                      u"(ESI) to be rendered as ESI links instead of "
-                      u"invoked directly."),
-        default=False,
-    )
-
     default_grid_system = schema.ASCIILine(
         title=_(u'Default grid system'),
         description=_(u'Grid system to use when one is not specified '
@@ -72,15 +57,3 @@ class IOmittedField(Interface):
     """Marker interface to distinguish the layout behavior schema fields from
     other fields to allow hiding them in the user interfaces
     """
-
-
-class ILayoutFieldDefaultValue(Interface):
-    """Multi adapter interface for looking up the default value for the
-    layout field content
-    """
-
-    def __unicode__():
-        """Return the layout as a unicode value"""
-
-    def __str__():
-        """Return the layout as a str value"""

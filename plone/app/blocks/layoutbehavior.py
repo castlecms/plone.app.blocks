@@ -1,43 +1,29 @@
 # -*- coding: utf-8 -*-
-from Products.Five import BrowserView
-from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from hashlib import md5
+import logging
+
+from collective.dexteritytextindexer import searchable
 from lxml import html
-from plone.app.blocks.interfaces import IBlocksTransformEnabled
 from plone.app.blocks.interfaces import DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY
+from plone.app.blocks.interfaces import IBlocksTransformEnabled
 from plone.app.blocks.interfaces import ILayoutField
 from plone.app.blocks.interfaces import IOmittedField
 from plone.app.blocks.interfaces import _
-from plone.app.layout.globals.interfaces import IViewView
-from plone.autoform.directives import write_permission
+from plone.app.theming import utils as theming_utils
 from plone.autoform.interfaces import IFormFieldProvider
 from plone.dexterity.browser.view import DefaultView
 from plone.memoize.ram import cache
 from plone.outputfilters import apply_filters
 from plone.outputfilters.interfaces import IFilter
 from plone.registry.interfaces import IRegistry
+from plone.supermodel import model
+from plone.supermodel.directives import fieldset
 from zExceptions import NotFound
 from zope import schema
 from zope.component import getAdapters
 from zope.component import getUtility
 from zope.interface import alsoProvides
 from zope.interface import implements
-import logging
-import os
-
-try:
-    from plone.supermodel import model
-    from plone.supermodel.directives import fieldset
-except ImportError:
-    # BBB: Plone 4.2 with Dexterity 1.x
-    from plone.directives import form as model
-    from plone.directives.form import fieldset
-
-try:
-    from collective.dexteritytextindexer import searchable
-    HAS_DXTEXTINDEXER = True
-except ImportError:
-    HAS_DXTEXTINDEXER = False
 
 
 logger = logging.getLogger('plone.app.blocks')
@@ -64,8 +50,7 @@ class LayoutField(schema.Text):
 class ILayoutAware(model.Schema):
     """Behavior interface to make a type support layout.
     """
-    if HAS_DXTEXTINDEXER:
-        searchable('content')
+    searchable('content')
     content = LayoutField(
         title=_(u"Custom layout"),
         description=_(u"Custom content and content layout of this page"),
@@ -78,48 +63,11 @@ class ILayoutAware(model.Schema):
         description=_(u'Selected content layout. If selected, custom layout is ignored.'),
         required=False)
 
-    pageSiteLayout = schema.Choice(
-        title=_(u"Site layout"),
-        description=_(u"Site layout to apply to this page "
-                      u"instead of the default site layout"),
-        vocabulary="plone.availableSiteLayouts",
-        required=False
-    )
-    write_permission(pageSiteLayout="plone.ManageSiteLayouts")
-
-    sectionSiteLayout = schema.Choice(
-        title=_(u"Section site layout"),
-        description=_(u"Site layout to apply to sub-pages of this page "
-                      u"instead of the default site layout"),
-        vocabulary="plone.availableSiteLayouts",
-        required=False
-    )
-    write_permission(sectionSiteLayout="plone.ManageSiteLayouts")
-
     fieldset('layout', label=_('Layout'),
-             fields=('content', 'pageSiteLayout', 'sectionSiteLayout', 'contentLayout'))
+             fields=('content', 'contentLayout'))
 
 alsoProvides(ILayoutAware, IFormFieldProvider)
-
 alsoProvides(ILayoutAware['content'], IOmittedField)
-alsoProvides(ILayoutAware['pageSiteLayout'], IOmittedField)
-alsoProvides(ILayoutAware['sectionSiteLayout'], IOmittedField)
-
-
-class SiteLayoutView(BrowserView):
-    """Default site layout view called from the site layout resolving view"""
-
-    implements(IViewView)
-
-    index = ViewPageTemplateFile(os.path.join('templates',
-                                              'main_template.pt'))
-
-    def __init__(self, context, request, name='layout'):
-        super(SiteLayoutView, self).__init__(context, request)
-        self.__name__ = name
-
-    def __call__(self):
-        return self.index()
 
 
 @cache(lambda fun, path, resolved: md5(resolved).hexdigest())
@@ -191,4 +139,6 @@ class ContentLayoutView(DefaultView):
         # directly by purpose
         filters = [f for _, f
                    in getAdapters((self.context, self.request), IFilter)]
-        return apply_filters(filters, layout)
+        layout = apply_filters(filters, layout)
+        # render with theming engine
+        return theming_utils.renderWithTheme(self.context, self.request, layout)

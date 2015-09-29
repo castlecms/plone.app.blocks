@@ -21,12 +21,10 @@ setup(
     name='plone.app.blocks',
     version=version,
     description="Implements the in-Plone blocks rendering process",
-    long_description='%s\n%s\n%s\n%s' % (
+    long_description='%s\n%s\n%s' % (
         open("README.rst").read(),
         open(os.path.join("plone", "app", "blocks",
                           "tests", "rendering.rst")).read(),
-        open(os.path.join("plone", "app", "blocks",
-                          "tests", "esi.rst")).read(),
         open("CHANGES.rst").read(),
     ),
     classifiers=[
