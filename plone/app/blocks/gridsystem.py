@@ -54,6 +54,36 @@ class BS3GridSystem(object):
             return result
 
 
+class FoundationGridSystem(object):
+    implements(IGridSystem)
+
+    def transform(self, key):
+        """ its possible:
+            {type: row} -> row
+            {type: cell, info: {sm:False, md:True, lg:true, pos:{width:10}}} ->
+                hide-for-small-only medium-10 columns
+        """
+        element = json.loads(key)
+        if 'type' in element and element['type'] == 'row':
+            self.offset = 1
+            return 'row'
+        elif 'type' in element and element['type'] == 'cell':
+            result = ''
+            if 'info' in element:
+                if 'xs' in element['info'] and element['info']['xs'].lower() == "false":
+                    result += 'hide-for-small-only '
+                if 'sm' in element['info'] and element['info']['sm'].lower() == "false":
+                    result += 'hide-for-small-only '
+                if 'md' in element['info'] and element['info']['md'].lower() == "false":
+                    result += 'hide-for-medium-only '
+                if 'lg' in element['info'] and element['info']['lg'].lower() == "false":
+                    result += 'hide-for-large-only '
+                if 'pos' in element['info']:
+                    if 'width' in element['info']['pos']:
+                        result += 'medium-%d columns ' % element['info']['pos']['width']
+            return result
+
+
 class DecoGridSystem(object):
     implements(IGridSystem)
 
@@ -99,7 +129,11 @@ def merge(request, layoutTree):
     gridUtil = gridUtil()
     for layoutGridNode in utils.gridDataXPath(layoutTree):
         gridinfo = layoutGridNode.attrib['data-grid']
-        cssGridClass = gridUtil.transform(gridinfo)
+        try:
+            cssGridClass = gridUtil.transform(gridinfo)
+        except (ValueError, KeyError):
+            logger.info('error parsing grid config %s' % gridinfo)
+            return layoutTree
         if cssGridClass is not None:
             if 'class' in layoutGridNode.attrib:
                 layoutGridNode.attrib['class'] = layoutGridNode.attrib['class'] + ' ' + cssGridClass  # noqa

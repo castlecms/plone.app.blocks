@@ -92,6 +92,13 @@
         name="bs3"
         />
 
+    <!-- Foundation Grid System -->
+    <utility
+        provides=".gridsystem.IGridSystem"
+        component=".gridsystem.FoundationGridSystem"
+        name="foundation"
+        />
+
     <!-- Deco Grid System -->
     <utility
         provides=".gridsystem.IGridSystem"
@@ -101,13 +108,7 @@
 
     <!-- 8000: Turn the response into an lxml tree for further manipulation -->
     <adapter
-        for="* .interfaces.IBlocksTransformEnabled"
-        name="plone.app.blocks.parsexml"
-        factory=".transform.ParseXML"
-        />
-
-    <adapter
-        for=".interfaces.IBlocksTransformEnabled .interfaces.IBlocksLayer"
+        for="* *"
         name="plone.app.blocks.parsexml"
         factory=".transform.ParseXML"
         />
@@ -127,17 +128,10 @@
 
     <!-- 8700: Replace css classes -->
     <adapter
-        for="* .interfaces.IBlocksTransformEnabled"
+        for="* *"
         name="plone.app.blocks.gridsystem"
         factory=".transform.ApplyResponsiveClass"
         />
-
-    <adapter
-        for=".interfaces.IBlocksTransformEnabled .interfaces.IBlocksLayer"
-        name="plone.app.blocks.gridsystem"
-        factory=".transform.ApplyResponsiveClass"
-        />
-
 
     <!-- patches -->
     <include package="collective.monkeypatcher" />
