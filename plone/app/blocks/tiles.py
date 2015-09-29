@@ -52,7 +52,7 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site):
             # error rendering, let's just cut out...
             logger.error(
                 'nasty uncaught tile error, data: %s,\n%s\n%s' % (
-                    '/'.join(context.getPhysicalPath()),
+                    tileHref,
                     repr(tileData),
                     traceback.format_exc()))
             res = """<html><body>
