@@ -33,6 +33,7 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site):
         # doing the subrequest
 
         relHref = tileHref[len(siteUrl) + 1:]
+
         contextPath, tilePart = relHref.split('@@', 1)
         contextPath = contextPath.strip('/')
         if contextPath not in contexts:
@@ -61,7 +62,7 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site):
             </p></body></html>"""
 
         tileTree = html.fromstring(res).getroottree()
-    except ComponentLookupError:
+    except (ComponentLookupError, ValueError):
         # fallback to subrequest route, slower but safer?
         try:
             tileTree = utils.resolve(tileHref)
