@@ -1,44 +1,14 @@
 # -*- coding: utf-8 -*-
-import re
-
 from lxml import etree
 from lxml import html
+from OFS.Image import File
+from plone.app.blocks import gridsystem
 from plone.transformchain.interfaces import ITransform
 from repoze.xmliter.serializer import XMLSerializer
 from repoze.xmliter.utils import getHTMLSerializer
 from zope.interface import implements
 
-from plone.app.blocks import panel, tiles, gridsystem
-from plone.tiles import esi
-from plone.tiles.interfaces import ESI_HEADER
-
-
-class DisableParsing(object):
-    """A no-op transform which sets flags to stop plone.app.blocks
-    transformations. You may register this for a particular published
-    object or request as required. By default, it's registered for ESI-
-    rendered tiles when they are fetched via ESI.
-    """
-
-    implements(ITransform)
-
-    order = 8000
-
-    def __init__(self, published, request):
-        self.published = published
-        self.request = request
-
-    def transformString(self, result, encoding):
-        self.request.set('plone.app.blocks.disabled', True)
-        return None
-
-    def transformUnicode(self, result, encoding):
-        self.request.set('plone.app.blocks.disabled', True)
-        return None
-
-    def transformIterable(self, result, encoding):
-        self.request.set('plone.app.blocks.disabled', True)
-        return None
+import re
 
 
 class ParseXML(object):
@@ -69,6 +39,14 @@ class ParseXML(object):
         return self.transformIterable([result], encoding)
 
     def transformIterable(self, result, encoding):
+        try:
+            # We do NOT want to transform File responses since these can be layouts
+            if isinstance(self.published.im_self, File):
+                self.request['plone.app.blocks.disabled'] = True
+                return None
+        except AttributeError:
+            pass
+
         if self.request.get('plone.app.blocks.disabled', False):
             return None
 
@@ -97,76 +75,6 @@ class ParseXML(object):
             return None
 
 
-class MergePanels(object):
-    """Find the site layout and merge panels.
-    """
-
-    implements(ITransform)
-
-    order = 8100
-
-    def __init__(self, published, request):
-        self.published = published
-        self.request = request
-
-    def transformString(self, result, encoding):
-        return None
-
-    def transformUnicode(self, result, encoding):
-        return None
-
-    def transformIterable(self, result, encoding):
-        if not self.request.get('plone.app.blocks.enabled', False) or \
-                not isinstance(result, XMLSerializer):
-            return None
-
-        tree = panel.merge(self.request, result.tree)
-        if tree is None:
-            return None
-
-        # Set a marker in the request to let subsequent steps know the merging
-        # has happened
-        self.request['plone.app.blocks.merged'] = True
-
-        result.tree = tree
-
-        # Fix serializer when layout has changed doctype from XHTML to HTML
-        if (result.tree.docinfo.doctype
-                and 'XHTML' not in result.tree.docinfo.doctype):
-            result.serializer = html.tostring
-
-        return result
-
-
-class IncludeTiles(object):
-    """Turn a panel-merged page into the final composition by including tiles.
-    Assumes the input result is an lxml tree and returns an lxml tree for
-    later serialization.
-    """
-
-    implements(ITransform)
-
-    order = 8500
-
-    def __init__(self, published, request):
-        self.published = published
-        self.request = request
-
-    def transformString(self, result, encoding):
-        return None
-
-    def transformUnicode(self, result, encoding):
-        return None
-
-    def transformIterable(self, result, encoding):
-        if not self.request.get('plone.app.blocks.enabled', False) or \
-                not isinstance(result, XMLSerializer):
-            return None
-
-        result.tree = tiles.renderTiles(self.request, result.tree)
-        return result
-
-
 class ApplyResponsiveClass(object):
     """Turn a panel-merged page into the final composition by including tiles.
     Assumes the input result is an lxml tree and returns an lxml tree for
@@ -175,7 +83,7 @@ class ApplyResponsiveClass(object):
 
     implements(ITransform)
 
-    order = 8700
+    order = 8900
 
     def __init__(self, published, request):
         self.published = published
@@ -193,35 +101,3 @@ class ApplyResponsiveClass(object):
             return None
         result.tree = gridsystem.merge(self.request, result.tree)
         return result
-
-
-class ESIRender(object):
-    """If ESI rendering was used, render the page down to a format that allows
-    ESI to work.
-    """
-
-    implements(ITransform)
-
-    order = 8900
-
-    def __init__(self, published, request):
-        self.published = published
-        self.request = request
-
-    def transformString(self, result, encoding):
-        if self.request.getHeader(ESI_HEADER, 'false').lower() != 'true':
-            return None
-
-        return esi.substituteESILinks(result)
-
-    def transformUnicode(self, result, encoding):
-        if self.request.getHeader(ESI_HEADER, 'false').lower() != 'true':
-            return None
-
-        return esi.substituteESILinks(result)
-
-    def transformIterable(self, result, encoding):
-        if self.request.getHeader(ESI_HEADER, 'false').lower() != 'true':
-            return None
-
-        return esi.substituteESILinks("".join(result))

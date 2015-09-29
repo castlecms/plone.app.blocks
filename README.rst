@@ -2,6 +2,21 @@
 Introduction to Blocks
 ======================
 
+This is a fork of the standard plone.app.blocks package for Castle CMS. The main
+difference in this package is the way tiles are rendered on a page to improve
+eliability and speed.
+
+This fork also removes things that are unnecessary transforms:
+
+- plone.app.blocks.mergepanels
+- plone.app.blocks.esirender
+
+
+This package is released to a private repository.
+
+The rest of the docs are exactly the same as the original...
+
+
 .. image:: https://secure.travis-ci.org/plone/plone.app.blocks.png?branch=master
     :alt: Travis CI badge
     :target: http://travis-ci.org/plone/plone.app.blocks
@@ -24,11 +39,6 @@ The rendering stages are:
     This is then used by the subsequent stages. If the input is not HTML,
     the transformation is aborted.
 
- plone.app.blocks.mergepanels (order 8100)
-    Looks up the site layout and executes the panel merge algorithm. Sets a
-    request variable ('plone.app.blocks.merged') to indicate that it has
-    done its job.
-
  plone.app.blocks.tiles (order 8500)
     Resolve tiles and place them directly into the merged layout. This is the
     fallback for views that do not opt into ITilePageRendered.
@@ -41,13 +51,6 @@ plone.app.blocks.gridsystem (order 8700)
     grid system used, change the IBlocksSettings.default_grid_system value
     in the Configuration Registry. If you're only using content tile
     transforms, you'll need to set a default grid system that matches your theme.
-
- plone.app.blocks.esirender (order 8900)
-    Only executed if the request key ``plone.app.blocks.esi`` is set and
-    has a true value, as would be the case if any ESI-rendered tiles are
-    included and ESI rendering is enabled globally. This step will serialise
-    the response down to a string and perform some substitution to make ESI
-    rendering work.
 
 
 Site layouts
@@ -79,7 +82,7 @@ may contain multiple ``[sitelayout]`` sections.
 
 A vocabulary factory called ``plone.availableSiteLayouts`` is registered to
 allow lookup of all registered site layouts.  The terms in this vocabulary
-use the URL as a value, the resource directory name as a token, and the 
+use the URL as a value, the resource directory name as a token, and the
 title from the manifest (falling back on a sanitised version of the resource
 directory name) as the title.
 
@@ -124,7 +127,7 @@ may contain multiple ``[contentlayout]`` sections.
 
 A vocabulary factory called ``plone.availableContentLayouts`` is registered to
 allow lookup of all registered content layouts.  The terms in this vocabulary
-use the URL as a value, the resource directory name as a token, and the 
+use the URL as a value, the resource directory name as a token, and the
 title from the manifest (falling back on a sanitised version of the resource
 directory name) as the title.
 

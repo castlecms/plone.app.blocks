@@ -1,55 +1,27 @@
 # -*- coding: utf-8 -*-
 from ConfigParser import SafeConfigParser
 import logging
-import urlparse
 
-from Acquisition import aq_parent
 import Globals
-from OFS.interfaces import ITraversable
 from Products.CMFCore.utils import getToolByName
 from plone.app.blocks.interfaces import CONTENT_LAYOUT_FILE_NAME
 from plone.app.blocks.interfaces import CONTENT_LAYOUT_MANIFEST_FORMAT
 from plone.app.blocks.interfaces import CONTENT_LAYOUT_RESOURCE_NAME
-from plone.app.blocks.interfaces import DEFAULT_AJAX_LAYOUT_REGISTRY_KEY
-from plone.app.blocks.interfaces import DEFAULT_SITE_LAYOUT_REGISTRY_KEY
-from plone.app.blocks.interfaces import SITE_LAYOUT_FILE_NAME
-from plone.app.blocks.interfaces import SITE_LAYOUT_MANIFEST_FORMAT
-from plone.app.blocks.interfaces import SITE_LAYOUT_RESOURCE_NAME
-from plone.app.blocks.layoutbehavior import SiteLayoutView
-from plone.app.blocks.utils import getDefaultAjaxLayout
-from plone.app.blocks.utils import getDefaultSiteLayout
-from plone.app.blocks.utils import getLayoutAwareSiteLayout
-from plone.app.blocks.utils import resolveResource
 from plone.memoize import view
 from plone.memoize import volatile
-from plone.registry.interfaces import IRecordModifiedEvent
 from plone.resource.manifest import MANIFEST_FILENAME
 from plone.resource.traversal import ResourceTraverser
 from plone.resource.utils import iterDirectoriesOfType
-from plone.subrequest import ISubRequest
-from zExceptions import NotFound
 from zope.annotation import IAnnotations
-from zope.component import adapter
 from zope.globalrequest import getRequest
 from zope.interface import implements
-from zope.publisher.browser import BrowserView
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
-from zope.site.hooks import getSite
+from zope.dottedname.resolve import resolve
 
 
 logger = logging.getLogger('plone.app.blocks')
-
-
-class SiteLayoutTraverser(ResourceTraverser):
-    """The site layout traverser.
-
-    Allows traveral to /++sitelayout++<name> using ``plone.resource`` to fetch
-    things stored either on the filesystem or in the ZODB.
-    """
-
-    name = SITE_LAYOUT_RESOURCE_NAME
 
 
 class ContentLayoutTraverser(ResourceTraverser):
@@ -85,6 +57,14 @@ def getLayoutsFromManifest(fp, format, directory_name):
     parser = SafeConfigParser(None, multidict)
     parser.readfp(fp)
 
+    if parser.has_section('config1'):
+        layer = parser.get('config1', 'layer', '')
+        if layer:
+            req = getRequest()
+            layer = resolve(layer)
+            if not layer.providedBy(req):
+                return {}
+
     layouts = {}
     for section in parser.sections():
         if not section.startswith(format.resourceType) or ':variants' in section:
@@ -112,33 +92,39 @@ def getLayoutsFromManifest(fp, format, directory_name):
     return layouts
 
 
-def getLayoutsFromResources(format):
+def getLayoutsFromDirectory(directory, _format):
+    layouts = {}
+    name = directory.__name__
+    if directory.isFile(MANIFEST_FILENAME):
+        manifest = directory.openFile(MANIFEST_FILENAME)
+        try:
+            layouts.update(getLayoutsFromManifest(manifest, _format, name))
+        except:
+            logger.exception(
+                "Unable to read manifest for theme directory %s", name)
+        finally:
+            manifest.close()
+    else:
+        # can provide default file for it with no manifest
+        filename = format.defaults.get('file', '')
+        if filename and directory.isFile(filename):
+            _id = name + '/' + filename
+            if _id not in layouts:
+                # not overridden
+                layouts[_id] = {
+                    'title': name.capitalize().replace('-', ' ').replace('.', ' '),
+                    'description': '',
+                    'directory': name,
+                    'file': format.defaults.get('file', '')
+                }
+    return layouts
+
+
+def getLayoutsFromResources(_format):
     layouts = {}
 
-    for directory in iterDirectoriesOfType(format.resourceType):
-
-        name = directory.__name__
-        if directory.isFile(MANIFEST_FILENAME):
-            manifest = directory.openFile(MANIFEST_FILENAME)
-            try:
-                layouts.update(getLayoutsFromManifest(manifest, format, name))
-            except:
-                logger.exception("Unable to read manifest for theme directory %s", name)
-            finally:
-                manifest.close()
-        else:
-            # can provide default file for it with no manifest
-            filename = format.defaults.get('file', '')
-            if filename and directory.isFile(filename):
-                _id = name + '/' + filename
-                if _id not in layouts:
-                    # not overridden
-                    layouts[_id] = {
-                        'title': name.capitalize().replace('-', ' ').replace('.', ' '),
-                        'description': '',
-                        'directory': name,
-                        'file': format.defaults.get('file', '')
-                    }
+    for directory in iterDirectoriesOfType(_format.resourceType):
+        layouts.update(getLayoutsFromDirectory(directory, _format))
 
     return layouts
 
@@ -191,11 +177,6 @@ class AvailableLayoutsVocabulary(object):
         return fab(context, self.format, self.defaultFilename)
 
 
-AvailableSiteLayoutsVocabularyFactory = AvailableLayoutsVocabulary(
-    SITE_LAYOUT_MANIFEST_FORMAT,
-    SITE_LAYOUT_FILE_NAME,
-)
-
 AvailableContentLayoutsVocabularyFactory = AvailableLayoutsVocabulary(
     CONTENT_LAYOUT_MANIFEST_FORMAT,
     CONTENT_LAYOUT_FILE_NAME,
@@ -217,92 +198,3 @@ def cacheKey(method, self):
         self.request.form.get('ajax_load'),
         catalog.getCounter(),
     )
-
-
-@adapter(IRecordModifiedEvent)
-def globalSiteLayoutModified(event):
-    """Invalidate caches if the global site layout is changed. This will
-    likely also affect things cached using plone.app.caching, which is what
-    we want - the page has probably changed
-    """
-    if event.record.__name__ in (DEFAULT_SITE_LAYOUT_REGISTRY_KEY,
-                                 DEFAULT_AJAX_LAYOUT_REGISTRY_KEY):
-        if event.oldValue != event.newValue:
-            catalog = getToolByName(getSite(), 'portal_catalog', None)
-            if catalog is not None and hasattr(catalog, '_increment_counter'):
-                catalog._increment_counter()
-
-
-class DefaultSiteLayout(BrowserView):
-    """Look up and render the site layout to use for the context.
-
-    Use this for a page that does not have the ILayout behavior, or a
-    standalone page template.
-
-    The idea is that you can do:
-
-        <html data-layout="./@@default-site-layout">
-
-    and always get the correct site layout for the page, taking section-
-    specific settings into account.
-    """
-
-    def __call__(self):
-        try:
-            return self.index()
-        except NotFound:
-            if ISubRequest.providedBy(self.request):
-                return SiteLayoutView(
-                    self.context, self.request.PARENT_REQUEST)()
-            else:
-                return SiteLayoutView(self.context, self.request)()
-
-    @property
-    @volatile.cache(cacheKey, volatile.store_on_context)
-    def layout(self):
-        layout = self._getLayout()
-        if layout is None:
-            raise NotFound("No default site layout set")
-
-        pathContext = self.context
-        while not ITraversable.providedBy(pathContext):
-            pathContext = aq_parent(pathContext)
-            if pathContext is None:
-                break
-
-        path = layout
-        if pathContext is not None:
-            path = urlparse.urljoin(pathContext.absolute_url_path(), layout)
-
-        return path
-
-    @volatile.cache(cacheKey, volatile.store_on_context)
-    def index(self):
-        return resolveResource(self.layout)
-
-    def _getLayout(self):
-        if self.request.form.get('ajax_load'):
-            return getDefaultAjaxLayout(self.context)
-        else:
-            return getDefaultSiteLayout(self.context)
-
-
-class PageSiteLayout(DefaultSiteLayout):
-    """Look up and render the site layout to use for the context.
-
-    Use this for a page that does have the ILayout behavior. It will take the
-    ``pageSiteLayout`` property into account.
-
-    The idea is that you can do:
-
-        <html data-layout="./@@page-site-layout">
-
-    and always get the correct site layout for the page, taking section-
-    and page-specific settings into account.
-    """
-
-    def _getLayout(self):
-        if self.request.form.get('ajax_load'):
-            return getDefaultAjaxLayout(self.context)
-        else:
-            return getLayoutAwareSiteLayout(self.context)

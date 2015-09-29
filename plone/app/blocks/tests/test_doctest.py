@@ -11,7 +11,6 @@ optionflags = (doctest.ELLIPSIS | doctest.NORMALIZE_WHITESPACE |
 
 doc_tests = [
     'context.rst',
-    'esi.rst',
     'rendering.rst',
 ]
 
