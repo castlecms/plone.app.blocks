@@ -1,25 +1,30 @@
 # -*- coding: utf-8 -*-
-from urlparse import parse_qsl
-from plone import api
-from Products.CMFPlone.log import logger
-from lxml import html
-from zope.component import getMultiAdapter
-from zope.component import ComponentLookupError
-from lxml import etree
-from urlparse import urljoin
 import traceback
+from urlparse import urljoin
+
+from Products.CMFPlone.log import logger
+from lxml import etree
+from lxml import html
+from plone import api
+from plone.app.blocks import formparser
 from plone.app.blocks import utils
 from zExceptions import NotFound
+from zope.component import ComponentLookupError
+from zope.component import getMultiAdapter
 
 
-def _modRequest(request, query):
+def _modRequest(request, query_string):
     request.original_data = request.form
-    request.form = dict(parse_qsl(query))
+    request.original_qs = request.environ['QUERY_STRING']
+    request.environ['QUERY_STRING'] = query_string
+    request.form = formparser.parse(request.environ)
 
 
 def _restoreRequest(request):
     if hasattr(request, 'original_data'):
         request.form = request.original_data
+    if hasattr(request, 'original_qs'):
+        request.environ['QUERY_STRING'] = request.original_qs
 
 
 def _renderTile(request, node, contexts, baseURL, siteUrl, site):
@@ -31,7 +36,6 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site):
     try:
         # first try to resolve manually, this will be much faster than
         # doing the subrequest
-
         relHref = tileHref[len(siteUrl) + 1:]
 
         contextPath, tilePart = relHref.split('@@', 1)
