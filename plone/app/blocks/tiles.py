@@ -23,7 +23,7 @@ def _restoreRequest(request):
 
 
 def _renderTile(request, node, contexts, baseURL, siteUrl, site):
-
+    theme_disabled = request.response.getHeader('X-Theme-Disabled')
     tileHref = node.attrib[utils.tileAttrib]
     tileTree = None
     if not tileHref.startswith('/'):
@@ -76,6 +76,10 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site):
         return
     finally:
         _restoreRequest(request)
+        if theme_disabled:
+            request.response.setHeader('X-Theme-Disabled', '1')
+        else:
+            request.response.setHeader('X-Theme-Disabled', '')
 
     return tileTree
 
