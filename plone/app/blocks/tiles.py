@@ -48,9 +48,11 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site):
             _modRequest(request, tileData)
         else:
             tileName = tilePart
-        tileName = tileName.split('/')[0]
+        tileName, _, tileId = tileName.partition('/')
 
         tile = getMultiAdapter((context, request), name=tileName)
+        if tileId:
+            tile.id = tileId
         try:
             res = tile()
         except:
