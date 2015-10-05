@@ -1,36 +1,42 @@
-from plone.app.theming.utils import getCurrentTheme
-from zope.globalrequest import getRequest
-from plone.resource.utils import queryResourceDirectory
 from plone.app.theming.interfaces import THEME_RESOURCE_NAME
-from zope.interface import directlyProvides
-from zope.schema.interfaces import IContextSourceBinder
+from plone.app.theming.utils import getCurrentTheme
+from plone.resource.utils import queryResourceDirectory
+from zope.globalrequest import getRequest
+from zope.interface import implements
+from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleVocabulary
 
 
 CACHE_REQ_KEY = 'plone.sitelayouts'
 
+class AvailableSiteLayoutsFactory(object):
+    """Vocabulary to return available layouts of a given type
+    """
 
-def AvailableSiteLayouts(context):
-    req = getRequest()
-    if req and CACHE_REQ_KEY in req.environ:
-        return req.environ[CACHE_REQ_KEY]
+    implements(IVocabularyFactory)
 
-    currentTheme = getCurrentTheme()
-    if currentTheme is None:
-        return SimpleVocabulary([])
+    def __call__(self, context):
+        req = getRequest()
+        if req and CACHE_REQ_KEY in req.environ:
+            return req.environ[CACHE_REQ_KEY]
 
-    themeDirectory = queryResourceDirectory(
-        THEME_RESOURCE_NAME, currentTheme)
-    if themeDirectory is None:
-        return SimpleVocabulary([])
+        currentTheme = getCurrentTheme()
+        if currentTheme is None:
+            return SimpleVocabulary([])
 
-    terms = []
-    for filename in themeDirectory.listDirectory():
-        if filename.endswith('.html') and filename != 'index.html':
-            name = filename.replace('.html', '')
-            terms.append(
-                SimpleVocabulary.createTerm(name, name, name))
-    res = SimpleVocabulary(terms)
-    req.environ[CACHE_REQ_KEY] = res
-    return res
-directlyProvides(AvailableSiteLayouts, IContextSourceBinder)
+        themeDirectory = queryResourceDirectory(
+            THEME_RESOURCE_NAME, currentTheme)
+        if themeDirectory is None:
+            return SimpleVocabulary([])
+
+        terms = []
+        for filename in themeDirectory.listDirectory():
+            if filename.endswith('.html') and filename != 'index.html':
+                name = filename.replace('.html', '')
+                terms.append(
+                    SimpleVocabulary.createTerm(name, name, name))
+        res = SimpleVocabulary(terms)
+        if req:
+            req.environ[CACHE_REQ_KEY] = res
+        return res
+AvailableSiteLayouts = AvailableSiteLayoutsFactory()

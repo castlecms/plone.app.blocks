@@ -9,7 +9,6 @@ from plone.app.blocks.interfaces import IBlocksTransformEnabled
 from plone.app.blocks.interfaces import ILayoutField
 from plone.app.blocks.interfaces import IOmittedField
 from plone.app.blocks.interfaces import _
-from plone.app.blocks.vocabularies import AvailableSiteLayouts
 from plone.app.theming import utils as theming_utils
 from plone.autoform.directives import write_permission
 from plone.autoform.interfaces import IFormFieldProvider
@@ -69,7 +68,7 @@ class ILayoutAware(model.Schema):
         title=_(u"Site layout"),
         description=_(u"Site layout to apply to this page "
                       u"instead of the default site layout"),
-        source=AvailableSiteLayouts,
+        vocabulary="plone.availableSiteLayouts",
         required=False
     )
     write_permission(pageSiteLayout="plone.ManageSiteLayouts")
@@ -78,7 +77,7 @@ class ILayoutAware(model.Schema):
         title=_(u"Section site layout"),
         description=_(u"Site layout to apply to sub-pages of this page "
                       u"instead of the default site layout"),
-        source=AvailableSiteLayouts,
+        vocabulary="plone.availableSiteLayouts",
         required=False
     )
     write_permission(sectionSiteLayout="plone.ManageSiteLayouts")

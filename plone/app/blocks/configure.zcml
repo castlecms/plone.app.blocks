@@ -146,4 +146,8 @@
         replacement=".patches.create_ttw_site_layout_examples"
         />
 
+    <utility
+        component=".vocabularies.AvailableSiteLayouts"
+        name="plone.availableSiteLayouts"
+        />
 </configure>
