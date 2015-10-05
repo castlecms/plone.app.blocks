@@ -9,7 +9,9 @@ from plone.app.blocks.interfaces import IBlocksTransformEnabled
 from plone.app.blocks.interfaces import ILayoutField
 from plone.app.blocks.interfaces import IOmittedField
 from plone.app.blocks.interfaces import _
+from plone.app.blocks.vocabularies import AvailableSiteLayouts
 from plone.app.theming import utils as theming_utils
+from plone.autoform.directives import write_permission
 from plone.autoform.interfaces import IFormFieldProvider
 from plone.dexterity.browser.view import DefaultView
 from plone.memoize.ram import cache
@@ -63,8 +65,27 @@ class ILayoutAware(model.Schema):
         description=_(u'Selected content layout. If selected, custom layout is ignored.'),
         required=False)
 
+    pageSiteLayout = schema.Choice(
+        title=_(u"Site layout"),
+        description=_(u"Site layout to apply to this page "
+                      u"instead of the default site layout"),
+        source=AvailableSiteLayouts,
+        required=False
+    )
+    write_permission(pageSiteLayout="plone.ManageSiteLayouts")
+
+    sectionSiteLayout = schema.Choice(
+        title=_(u"Section site layout"),
+        description=_(u"Site layout to apply to sub-pages of this page "
+                      u"instead of the default site layout"),
+        source=AvailableSiteLayouts,
+        required=False
+    )
+    write_permission(sectionSiteLayout="plone.ManageSiteLayouts")
+
     fieldset('layout', label=_('Layout'),
-             fields=('content', 'contentLayout'))
+             fields=('content', 'pageSiteLayout', 'sectionSiteLayout', 'contentLayout'))
+
 
 alsoProvides(ILayoutAware, IFormFieldProvider)
 alsoProvides(ILayoutAware['content'], IOmittedField)
