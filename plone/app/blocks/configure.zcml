@@ -25,6 +25,10 @@
         title="Plone: Manage Content Layouts"
         />
     <permission
+        id="plone.ManageSiteLayouts"
+        title="Plone: Manage Site Layouts"
+        />
+    <permission
         id="plone.CustomizeContentLayouts"
         title="Plone: Customize Content Layouts"
         />

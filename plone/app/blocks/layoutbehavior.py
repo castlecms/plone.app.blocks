@@ -89,6 +89,8 @@ class ILayoutAware(model.Schema):
 
 alsoProvides(ILayoutAware, IFormFieldProvider)
 alsoProvides(ILayoutAware['content'], IOmittedField)
+alsoProvides(ILayoutAware['pageSiteLayout'], IOmittedField)
+alsoProvides(ILayoutAware['sectionSiteLayout'], IOmittedField)
 
 
 @cache(lambda fun, path, resolved: md5(resolved).hexdigest())
