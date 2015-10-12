@@ -33,8 +33,9 @@ class AvailableSiteLayoutsFactory(object):
         for filename in themeDirectory.listDirectory():
             if filename.endswith('.html') and filename != 'index.html':
                 name = filename.replace('.html', '')
+                label = name.replace('_', ' ').capitalize()
                 terms.append(
-                    SimpleVocabulary.createTerm(name, name, name))
+                    SimpleVocabulary.createTerm(name, name, label))
         res = SimpleVocabulary(terms)
         if req:
             req.environ[CACHE_REQ_KEY] = res

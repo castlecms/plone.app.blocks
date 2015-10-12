@@ -85,8 +85,9 @@
 
     <!-- Register vocabulary all available content layouts-->
     <utility
-        component=".resource.AvailableContentLayoutsVocabularyFactory"
+        component=".vocabularies.AvailableSiteLayoutsFactory"
         name="plone.availableContentLayouts"
+        provides="zope.schema.interfaces.IVocabularyFactory"
         />
 
     <!-- BS3 Grid System -->
