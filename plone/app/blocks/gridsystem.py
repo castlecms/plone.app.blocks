@@ -81,6 +81,8 @@ class FoundationGridSystem(object):
                 if 'pos' in element['info']:
                     if 'width' in element['info']['pos']:
                         result += 'medium-%d columns ' % element['info']['pos']['width']
+                    if 'offset' in element['info']['pos']:
+                        result += 'medium-offset-%d ' % element['info']['pos']['offset']
             return result
 
 

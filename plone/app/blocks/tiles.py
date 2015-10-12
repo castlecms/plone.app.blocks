@@ -23,8 +23,10 @@ def _modRequest(request, query_string):
 def _restoreRequest(request):
     if hasattr(request, 'original_data'):
         request.form = request.original_data
+        del request.original_data
     if hasattr(request, 'original_qs'):
         request.environ['QUERY_STRING'] = request.original_qs
+        del request.original_qs
 
 
 def _renderTile(request, node, contexts, baseURL, siteUrl, site):
