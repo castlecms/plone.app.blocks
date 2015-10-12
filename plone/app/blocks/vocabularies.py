@@ -35,7 +35,7 @@ class AvailableSiteLayoutsFactory(object):
                 name = filename.replace('.html', '')
                 label = name.replace('_', ' ').capitalize()
                 terms.append(
-                    SimpleVocabulary.createTerm(name, name, label))
+                    SimpleVocabulary.createTerm(filename, filename, label))
         res = SimpleVocabulary(terms)
         if req:
             req.environ[CACHE_REQ_KEY] = res
