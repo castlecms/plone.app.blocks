@@ -2,7 +2,6 @@
 from hashlib import md5
 import logging
 
-from collective.dexteritytextindexer import searchable
 from lxml import html
 from plone.app.blocks.interfaces import ILayoutField
 from plone.app.blocks.interfaces import IOmittedField
@@ -41,7 +40,7 @@ class LayoutField(schema.Text):
 class ILayoutAware(model.Schema):
     """Behavior interface to make a type support layout.
     """
-    searchable('content')
+
     content = LayoutField(
         title=_(u"Custom layout"),
         description=_(u"Custom content and content layout of this page"),
