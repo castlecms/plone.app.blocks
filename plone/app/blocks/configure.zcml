@@ -83,12 +83,6 @@
         factory=".resource.ContentLayoutTraverser"
         />
 
-    <!-- Register vocabulary all available content layouts-->
-    <utility
-        component=".vocabularies.AvailableSiteLayouts"
-        name="plone.availableContentLayouts"
-        />
-
     <!-- BS3 Grid System -->
     <utility
         provides=".gridsystem.IGridSystem"
@@ -149,5 +143,10 @@
     <utility
         component=".vocabularies.AvailableSiteLayouts"
         name="plone.availableSiteLayouts"
+        />
+
+    <utility
+        component=".resource.AvailableContentLayoutsVocabularyFactory"
+        name="plone.availableContentLayouts"
         />
 </configure>
