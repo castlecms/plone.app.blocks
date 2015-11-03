@@ -149,4 +149,11 @@
         component=".resource.AvailableContentLayoutsVocabularyFactory"
         name="plone.availableContentLayouts"
         />
+
+    <adapter name="SearchableText" factory=".indexing.LayoutSearchableText" />
+    <subscriber
+        for=".layoutbehavior.ILayoutAware
+             zope.lifecycleevent.interfaces.IObjectModifiedEvent"
+        handler=".subscribers.onLayoutEdited" />
+
 </configure>
