@@ -2,18 +2,23 @@
 import logging
 
 from AccessControl import getSecurityManager
+import Globals
 from lxml import etree
 from lxml import html
+from plone.app.blocks.interfaces import DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY
+from plone.app.blocks.layoutbehavior import ILayoutAware
+from plone.app.blocks.layoutbehavior import applyTilePersistent
 from plone.memoize.volatile import DontCache
-from zExceptions import NotFound
+from plone.registry.interfaces import IRegistry
+from plone.resource.utils import queryResourceDirectory
+from plone.subrequest import subrequest
 from z3c.form.interfaces import IFieldWidget
+from zExceptions import NotFound
 from zope.component import getMultiAdapter
+from zope.component import getUtility
 from zope.component import queryUtility
 from zope.security.interfaces import IPermission
 from zope.site.hooks import getSite
-import Globals
-
-from plone.subrequest import subrequest
 
 
 headXPath = etree.XPath("/html/head")
@@ -66,6 +71,17 @@ def resolveResource(url):
     """Resolve the given URL to a unicode string. If the URL is an absolute
     path, it will be made relative to the Plone site root.
     """
+    if url.count('++') == 2:
+        # it is a resource that can be resolved without a subrequest
+        _, resource_type, path = url.split('++')
+        resource_name, _, path = path.partition('/')
+        directory = queryResourceDirectory(resource_type, resource_name)
+        if directory:
+            try:
+                return directory.readFile(path)
+            except NotFound:
+                pass
+
     if url.startswith('/'):
         site = getSite()
         url = '/'.join(site.getPhysicalPath()) + url
@@ -206,3 +222,32 @@ def cacheKey(func, rules_url, theme_node):
     if Globals.DevelopmentMode:
         raise DontCache()
     return ':'.join([rules_url, html.tostring(theme_node)])
+
+
+def getLayout(content):
+    behavior_data = ILayoutAware(content)
+    if behavior_data.contentLayout:
+        try:
+            path = behavior_data.contentLayout
+            resolved = resolveResource(path)
+            layout = applyTilePersistent(path, resolved)
+        except (NotFound, RuntimeError):
+            layout = ''
+    else:
+        layout = behavior_data.content
+
+    if not layout:
+        registry = getUtility(IRegistry)
+        try:
+            path = registry['%s.%s' % (
+                DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY,
+                content.portal_type.replace(' ', '-'))]
+        except (KeyError, AttributeError):
+            path = None
+        try:
+            path = path or registry[DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY]
+            resolved = resolveResource(path)
+            layout = applyTilePersistent(path, resolved)
+        except (KeyError, NotFound, RuntimeError):
+            pass
+    return layout

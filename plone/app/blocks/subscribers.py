@@ -1,42 +1,16 @@
 from lxml.html import fromstring
 from plone.app.blocks import utils
-from plone.app.blocks.interfaces import DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY
-from plone.app.blocks.layoutbehavior import ILayoutAware
-from plone.app.blocks.layoutbehavior import applyTilePersistent
-from plone.app.blocks.utils import resolveResource
-from plone.registry.interfaces import IRegistry
 from plone.tiles.data import ANNOTATIONS_KEY_PREFIX
-from zExceptions import NotFound
 from zope.annotation.interfaces import IAnnotations
-from zope.component import getUtility
+from plone.app.blocks.utils import getLayout
 
 
 def onLayoutEdited(obj, event):
-    behavior_data = ILayoutAware(obj)
-    if behavior_data.contentLayout:
-        try:
-            path = behavior_data.contentLayout
-            resolved = resolveResource(path)
-            layout = applyTilePersistent(path, resolved)
-        except (NotFound, RuntimeError):
-            layout = ''
-    else:
-        layout = behavior_data.content
-
-    if not layout:
-        registry = getUtility(IRegistry)
-        try:
-            path = registry['%s.%s' % (
-                DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY,
-                obj.portal_type.replace(' ', '-'))]
-        except (KeyError, AttributeError):
-            path = None
-        try:
-            path = path or registry[DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY]
-            resolved = resolveResource(path)
-            layout = applyTilePersistent(path, resolved)
-        except (KeyError, NotFound, RuntimeError):
-            pass
+    """
+    need to get the layout because you need to know what are
+    acceptible storage values
+    """
+    layout = getLayout(obj)
 
     if not layout:
         return
