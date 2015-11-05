@@ -26,6 +26,9 @@ class ContentLayoutView(DefaultView):
         if not layout:
             layout = ERROR_LAYOUT
 
+        if isinstance(layout, unicode):
+            layout = layout.encode('utf8', 'ignore')
+
         # Here we skip legacy portal_transforms and call plone.outputfilters
         # directly by purpose
         filters = [f for _, f
