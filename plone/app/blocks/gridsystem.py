@@ -46,7 +46,7 @@ class BS3GridSystem(object):
                 if 'lg' in element['info'] and element['info']['lg'].lower() == "false":
                     result += 'hidden-lg '
                 if 'pos' in element['info']:
-                    if element['info']['pos']['x'] > self.offset:
+                    if 'x' in element['info']['pos'] and element['info']['pos']['x'] > self.offset:
                         result += 'col-md-offset-%d ' % (element['info']['pos']['x'] - (self.offset - 1))  # noqa
                     if 'width' in element['info']['pos']:
                         self.offset += element['info']['pos']['width']
