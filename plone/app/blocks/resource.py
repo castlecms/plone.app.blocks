@@ -18,6 +18,7 @@ from zope.interface import implements
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
+from zope.dottedname.resolve import resolve
 
 
 logger = logging.getLogger('plone.app.blocks')
@@ -55,6 +56,14 @@ class multidict(dict):
 def getLayoutsFromManifest(fp, format, directory_name):
     parser = SafeConfigParser(None, multidict)
     parser.readfp(fp)
+
+    if parser.has_section('config1'):
+        layer = parser.get('config1', 'layer', '')
+        if layer:
+            req = getRequest()
+            layer = resolve(layer)
+            if not layer.providedBy(req):
+                return {}
 
     layouts = {}
     for section in parser.sections():
