@@ -11,7 +11,7 @@ DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY = 'plone.app.blocks.default_layout'
 
 CONTENT_LAYOUT_MANIFEST_FORMAT = ManifestFormat(
     CONTENT_LAYOUT_RESOURCE_NAME,
-    keys=('title', 'description', 'file', 'screenshot', 'for'),
+    keys=('title', 'description', 'file', 'preview', 'for'),
     defaults={'file': CONTENT_LAYOUT_FILE_NAME}
 )
 
