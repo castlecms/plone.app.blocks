@@ -3,39 +3,11 @@ import re
 
 from lxml import etree
 from lxml import html
-from plone.app.blocks import tiles, gridsystem
+from plone.app.blocks import gridsystem
 from plone.transformchain.interfaces import ITransform
 from repoze.xmliter.serializer import XMLSerializer
 from repoze.xmliter.utils import getHTMLSerializer
 from zope.interface import implements
-
-
-class DisableParsing(object):
-    """A no-op transform which sets flags to stop plone.app.blocks
-    transformations. You may register this for a particular published
-    object or request as required. By default, it's registered for ESI-
-    rendered tiles when they are fetched via ESI.
-    """
-
-    implements(ITransform)
-
-    order = 8000
-
-    def __init__(self, published, request):
-        self.published = published
-        self.request = request
-
-    def transformString(self, result, encoding):
-        self.request.set('plone.app.blocks.disabled', True)
-        return None
-
-    def transformUnicode(self, result, encoding):
-        self.request.set('plone.app.blocks.disabled', True)
-        return None
-
-    def transformIterable(self, result, encoding):
-        self.request.set('plone.app.blocks.disabled', True)
-        return None
 
 
 class ParseXML(object):
@@ -79,6 +51,8 @@ class ParseXML(object):
             return None
 
         try:
+            if result and result[0][0] in ['{', '[']:
+                return
             # Fix layouts with CR[+LF] line endings not to lose their heads
             # (this has been seen with downloaded themes with CR[+LF] endings)
             iterable = [re.sub('&#13;', '\n', re.sub('&#13;\n', '\n', item))
@@ -92,35 +66,6 @@ class ParseXML(object):
             return result
         except (AttributeError, TypeError, etree.ParseError):
             return None
-
-
-class IncludeTiles(object):
-    """Turn a panel-merged page into the final composition by including tiles.
-    Assumes the input result is an lxml tree and returns an lxml tree for
-    later serialization.
-    """
-
-    implements(ITransform)
-
-    order = 8851
-
-    def __init__(self, published, request):
-        self.published = published
-        self.request = request
-
-    def transformString(self, result, encoding):
-        return None
-
-    def transformUnicode(self, result, encoding):
-        return None
-
-    def transformIterable(self, result, encoding):
-        if not self.request.get('plone.app.blocks.enabled', False) or \
-                not isinstance(result, XMLSerializer):
-            return None
-
-        result.tree = tiles.renderTiles(self.request, result.tree)
-        return result
 
 
 class ApplyResponsiveClass(object):
