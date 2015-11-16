@@ -51,8 +51,6 @@ class ParseXML(object):
             return None
 
         try:
-            if result and result[0][0] in ['{', '[']:
-                return
             # Fix layouts with CR[+LF] line endings not to lose their heads
             # (this has been seen with downloaded themes with CR[+LF] endings)
             iterable = [re.sub('&#13;', '\n', re.sub('&#13;\n', '\n', item))
