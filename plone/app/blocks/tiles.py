@@ -69,6 +69,9 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site):
             We apologize, there was an error rendering this snippet
             </p></body></html>"""
 
+        if not res:
+            return
+
         tileTree = html.fromstring(res).getroottree()
     except (ComponentLookupError, ValueError):
         # fallback to subrequest route, slower but safer?
@@ -114,6 +117,9 @@ def renderTiles(request, tree):
         if tileTree is not None:
             tileRoot = tileTree.getroot()
             utils.replace_with_children(tileNode, tileRoot.find('head'))
+        else:
+            parent = tileNode.getparent()
+            parent.remove(tileNode)
 
     for tileNode in utils.bodyTileXPath(tree):
         tileTree = _renderTile(request, tileNode, contexts, baseURL, siteUrl, site)
@@ -130,5 +136,8 @@ def renderTiles(request, tree):
                 for tileHeadChild in tileHead:
                     headNode.append(tileHeadChild)
             utils.replace_with_children(tileNode, tileBody)
+        else:
+            parent = tileNode.getparent()
+            parent.remove(tileNode)
 
     return tree
