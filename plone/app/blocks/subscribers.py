@@ -25,6 +25,9 @@ def onLayoutEdited(obj, event):
             ANNOTATIONS_KEY_PREFIX + '.' + tile_url.split('?')[0].split('/')[-1])
 
     annotations = IAnnotations(obj)
-    for key in list(annotations.keys()):
-        if key.startswith(ANNOTATIONS_KEY_PREFIX) and key not in tile_keys:
-            del annotations[key]
+    previous = annotations.get(ANNOTATIONS_KEY_PREFIX + '.__previous')
+    if previous:
+        for key in previous:
+            if key not in tile_keys and key in annotations:
+                del annotations[key]
+    annotations[ANNOTATIONS_KEY_PREFIX + '.__previous'] = tile_keys
