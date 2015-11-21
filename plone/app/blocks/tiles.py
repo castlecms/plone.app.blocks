@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+from AccessControl import Unauthorized
+from zope.security import checkPermission
 import traceback
 from urlparse import urljoin
 
@@ -29,6 +31,18 @@ def _restoreRequest(request):
         del request.original_qs
 
 
+ERROR_TILE_RESULT = """<html><body>
+<p class="tileerror">
+We apologize, there was an error rendering this snippet
+</p></body></html>"""
+
+
+UNAUTHORIZED_TILE_RESULT = """<html><body>
+<p class="tileerror unauthorized">
+We apologize, there was an error rendering this snippet
+</p></body></html>"""
+
+
 def _renderTile(request, node, contexts, baseURL, siteUrl, site):
     theme_disabled = request.response.getHeader('X-Theme-Disabled')
     tileHref = node.attrib[utils.tileAttrib]
@@ -43,7 +57,12 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site):
         contextPath, tilePart = relHref.split('@@', 1)
         contextPath = contextPath.strip('/')
         if contextPath not in contexts:
-            contexts[contextPath] = site.restrictedTraverse(contextPath)
+            ob = site.unrestrictedTraverse(contextPath)
+            if not checkPermission('zope2.View', ob):
+                # manually check perms. We do not want restriction
+                # on traversing through an object
+                raise Unauthorized()
+            contexts[contextPath] = ob
         context = contexts[contextPath]
         if '?' in tilePart:
             tileName, tileData = tilePart.split('?', 1)
@@ -64,10 +83,7 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site):
                     tileHref,
                     repr(tileData),
                     traceback.format_exc()))
-            res = """<html><body>
-            <p class="tileerror">
-            We apologize, there was an error rendering this snippet
-            </p></body></html>"""
+            res = ERROR_TILE_RESULT
 
         if not res:
             return
@@ -85,6 +101,13 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site):
     except (NotFound, RuntimeError):
         logger.info('error parsing tile url %s' % tileHref)
         return
+    except Unauthorized:
+        logger.error(
+            'unauthorized tile error, data: %s,\n%s\n%s' % (
+                tileHref,
+                repr(tileData),
+                traceback.format_exc()))
+        tileTree = html.fromstring(UNAUTHORIZED_TILE_RESULT).getroottree()
     finally:
         _restoreRequest(request)
         if theme_disabled:
