@@ -143,4 +143,14 @@
              zope.lifecycleevent.interfaces.IObjectModifiedEvent"
         handler=".subscribers.onLayoutEdited" />
 
+
+    <!-- plone.tiles overrides here! -->
+    <include package="z3c.unconfigure" file="meta.zcml" />
+    <unconfigure>
+        <adapter factory="plone.tiles.data.transientTileDataManagerFactory" />
+        <adapter factory="plone.tiles.data.PersistentTileDataManager" />
+    </unconfigure>
+    <adapter factory=".tiles.transientTileDataManagerFactory" />
+    <adapter factory=".tiles.PersistentTileDataManager" />
+
 </configure>

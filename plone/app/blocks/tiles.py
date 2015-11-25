@@ -1,34 +1,104 @@
 # -*- coding: utf-8 -*-
-from AccessControl import Unauthorized
-from zope.security import checkPermission
+import logging
 import traceback
 from urlparse import urljoin
 
-from Products.CMFPlone.log import logger
+from AccessControl import Unauthorized
 from lxml import etree
 from lxml import html
 from plone import api
+from plone.tiles import data as tiles_data
 from plone.app.blocks import formparser
 from plone.app.blocks import utils
+from plone.tiles.interfaces import ITile
+from plone.tiles.interfaces import ITileDataManager
 from zExceptions import NotFound
 from zope.component import ComponentLookupError
+from zope.component import adapter
 from zope.component import getMultiAdapter
+from zope.interface import implementer
+from zope.schema import getFields
+from zope.security import checkPermission
+
+
+logger = logging.getLogger('plone.app.blocks')
+
+
+@adapter(ITile)
+@implementer(ITileDataManager)
+def transientTileDataManagerFactory(tile):
+    if (tile.request.get('X-Tile-Persistent') or
+            getattr(tile.request, 'tile_persistent', False)):
+        return PersistentTileDataManager(tile)
+    else:
+        return TransientTileDataManager(tile)
+
+
+class TransientTileDataManager(tiles_data.TransientTileDataManager):
+    def get(self):
+        # use explicitly set data (saved as annotation on the request)
+        if self.key in self.annotations:
+            data = dict(self.annotations[self.key])
+
+            if self.tileType is not None and self.tileType.schema is not None:
+                for name, field in getFields(self.tileType.schema).items():
+                    if name not in data:
+                        data[name] = field.missing_value
+
+        # try to use a '_tiledata' parameter in the request
+        elif hasattr(self.tile.request, 'tile_data'):
+            data = self.tile.request.tile_data
+
+        # fall back to the copy of request.form object itself
+        else:
+            # If we don't have a schema, just take the request
+            if self.tileType is None or self.tileType.schema is None:
+                data = self.tile.request.form.copy()
+            else:
+                # Try to decode the form data properly if we can
+                try:
+                    data = tiles_data.decode(self.tile.request.form,
+                                             self.tileType.schema, missing=True)
+                except (ValueError, UnicodeDecodeError,):
+                    logger.exception(u"Could not convert form data to schema")
+                    return {}
+        return data
+
+
+class PersistentTileDataManager(tiles_data.PersistentTileDataManager):
+
+    def _get_default_request_data(self):
+        if hasattr(self.tile.request, 'tile_data'):
+            data = self.tile.request.tile_data
+        else:
+            # If we don't have a schema, just take the request
+            if self.tileType is None or self.tileType.schema is None:
+                data = self.tile.request.form.copy()
+            else:
+                # Try to decode the form data properly if we can
+                try:
+                    data = tiles_data.decode(self.tile.request.form,
+                                             self.tileType.schema, missing=True)
+                except (ValueError, UnicodeDecodeError,):
+                    logger.exception(u"Could not convert form data to schema")
+                    return self.data.copy()
+        return data
 
 
 def _modRequest(request, query_string):
-    request.original_data = request.form
-    request.original_qs = request.environ['QUERY_STRING']
-    request.environ['QUERY_STRING'] = query_string
-    request.form = formparser.parse(request.environ)
+    env = request.environ.copy()
+    env['QUERY_STRING'] = query_string
+    data = formparser.parse(env)
+    request.tile_data = data
+    if data.get('X-Tile-Persistent'):
+        request.tile_persistent = True
 
 
 def _restoreRequest(request):
-    if hasattr(request, 'original_data'):
-        request.form = request.original_data
-        del request.original_data
-    if hasattr(request, 'original_qs'):
-        request.environ['QUERY_STRING'] = request.original_qs
-        del request.original_qs
+    if hasattr(request, 'tile_data'):
+        del request.tile_data
+    if hasattr(request, 'tile_persistent'):
+        del request.tile_persistent
 
 
 ERROR_TILE_RESULT = """<html><body>
