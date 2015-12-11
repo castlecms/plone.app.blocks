@@ -25,6 +25,8 @@ def LayoutSearchableText(obj):
     for key in annotations.keys():
         if key.startswith(ANNOTATIONS_KEY_PREFIX):
             data = annotations[key]
+            if not hasattr(data, 'get'):
+                continue
             for field_name in ('title', 'label', 'content'):
                 val = data.get(field_name)
                 if isinstance(val, basestring):
