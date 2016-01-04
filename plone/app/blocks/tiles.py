@@ -117,6 +117,7 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site):
     theme_disabled = request.response.getHeader('X-Theme-Disabled')
     tileHref = node.attrib[utils.tileAttrib]
     tileTree = None
+    tileData = ''
     if not tileHref.startswith('/'):
         tileHref = urljoin(baseURL, tileHref)
     try:

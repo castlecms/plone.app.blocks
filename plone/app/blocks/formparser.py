@@ -124,7 +124,10 @@ def field2lines(v):
 
 
 def field2boolean(v):
-    return bool(v)
+    v = field2string(v)
+    if v.lower() in ('1', 't', 'true'):
+        return True
+    return False
 
 
 type_converters = {
