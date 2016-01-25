@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from zope.security import checkPermission
 import logging
 import traceback
 from urlparse import urljoin
@@ -18,8 +19,7 @@ from zope.component import adapter
 from zope.component import getMultiAdapter
 from zope.interface import implementer
 from zope.schema import getFields
-from zope.security import checkPermission
-
+from AccessControl.SecurityManagement import getSecurityManager
 
 logger = logging.getLogger('plone.app.blocks')
 
@@ -113,7 +113,7 @@ We apologize, there was an error rendering this snippet
 </p></body></html>"""
 
 
-def _renderTile(request, node, contexts, baseURL, siteUrl, site):
+def _renderTile(request, node, contexts, baseURL, siteUrl, site, sm):
     theme_disabled = request.response.getHeader('X-Theme-Disabled')
     tileHref = node.attrib[utils.tileAttrib]
     tileTree = None
@@ -143,6 +143,18 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site):
         tileName, _, tileId = tileName.partition('/')
 
         tile = getMultiAdapter((context, request), name=tileName)
+        try:
+            if (contextPath and len(tile.__ac_permissions__) > 0 and
+                    not sm.checkPermission(tile.__ac_permissions__[0][0], tile)):
+                logger.info('Do not have permission for tile %s on context %s' % (
+                    tileName, contextPath))
+                return
+            else:
+                pass
+        except:
+            logger.warn('Could not check permissions of tile %s on context %s' % (
+                tileName, contextPath))
+            return
         if tileId:
             tile.id = tileId
         try:
@@ -205,9 +217,10 @@ def renderTiles(request, tree):
     contexts = {}
     site = api.portal.get()
     siteUrl = site.absolute_url()
+    sm = getSecurityManager()
 
     for tileNode in utils.headTileXPath(tree):
-        tileTree = _renderTile(request, tileNode, contexts, baseURL, siteUrl, site)
+        tileTree = _renderTile(request, tileNode, contexts, baseURL, siteUrl, site, sm)
         if tileTree is not None:
             tileRoot = tileTree.getroot()
             utils.replace_with_children(tileNode, tileRoot.find('head'))
@@ -216,7 +229,7 @@ def renderTiles(request, tree):
             parent.remove(tileNode)
 
     for tileNode in utils.bodyTileXPath(tree):
-        tileTree = _renderTile(request, tileNode, contexts, baseURL, siteUrl, site)
+        tileTree = _renderTile(request, tileNode, contexts, baseURL, siteUrl, site, sm)
         if tileTree is not None:
             tileRoot = tileTree.getroot()
 
