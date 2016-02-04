@@ -62,6 +62,7 @@
         name="layout_view"
         class=".browser.ContentLayoutView"
         permission="zope2.View"
+        template="templates/layout_view.pt"
         />
 
     <include package="plone.app.contentmenu" />

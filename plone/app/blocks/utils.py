@@ -22,6 +22,8 @@ from zope.site.hooks import getSite
 
 
 headXPath = etree.XPath("/html/head")
+layoutAttrib = 'data-layout'
+layoutXPath = etree.XPath("/html/@" + layoutAttrib)
 gridAttrib = 'data-gridsystem'
 gridXPath = etree.XPath("/html/@" + gridAttrib)
 tileAttrib = 'data-tile'
@@ -29,6 +31,7 @@ headTileXPath = etree.XPath("/html/head//*[@" + tileAttrib + "]")
 bodyTileXPath = etree.XPath("/html/body//*[@" + tileAttrib + "]")
 gridDataAttrib = 'data-grid'
 gridDataXPath = etree.XPath("//*[@" + gridDataAttrib + "]")
+panelXPath = etree.XPath("//*[@data-panel]")
 
 
 logger = logging.getLogger('plone.app.blocks')
