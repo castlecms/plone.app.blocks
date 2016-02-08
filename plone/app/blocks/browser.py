@@ -56,6 +56,9 @@ class ContentLayoutView(DefaultView):
         self.layout = self.get_layout()
         policy = theming_policy(self.request)
         settings = policy.getSettings()
-        if not settings or settings.rules:
-            return self.index()
+        try:
+            if not settings or settings.rules:
+                return self.index()
+        except AttributeError:
+            pass
         return renderWithTheme(self.context, self.request, self.layout)
