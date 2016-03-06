@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
-import re
-
 from lxml import etree
 from lxml import html
+from OFS.Image import File
 from plone.app.blocks import gridsystem
 from plone.transformchain.interfaces import ITransform
 from repoze.xmliter.serializer import XMLSerializer
 from repoze.xmliter.utils import getHTMLSerializer
 from zope.interface import implements
+
+import re
 
 
 class ParseXML(object):
@@ -38,6 +39,14 @@ class ParseXML(object):
         return self.transformIterable([result], encoding)
 
     def transformIterable(self, result, encoding):
+        try:
+            # We do NOT want to transform File responses since these can be layouts
+            if isinstance(self.published.im_self, File):
+                self.request['plone.app.blocks.disabled'] = True
+                return None
+        except AttributeError:
+            pass
+
         if self.request.get('plone.app.blocks.disabled', False):
             return None
 

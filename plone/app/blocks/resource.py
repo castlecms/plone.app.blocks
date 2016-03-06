@@ -92,33 +92,39 @@ def getLayoutsFromManifest(fp, format, directory_name):
     return layouts
 
 
-def getLayoutsFromResources(format):
+def getLayoutsFromDirectory(directory, _format):
+    layouts = {}
+    name = directory.__name__
+    if directory.isFile(MANIFEST_FILENAME):
+        manifest = directory.openFile(MANIFEST_FILENAME)
+        try:
+            layouts.update(getLayoutsFromManifest(manifest, _format, name))
+        except:
+            logger.exception(
+                "Unable to read manifest for theme directory %s", name)
+        finally:
+            manifest.close()
+    else:
+        # can provide default file for it with no manifest
+        filename = format.defaults.get('file', '')
+        if filename and directory.isFile(filename):
+            _id = name + '/' + filename
+            if _id not in layouts:
+                # not overridden
+                layouts[_id] = {
+                    'title': name.capitalize().replace('-', ' ').replace('.', ' '),
+                    'description': '',
+                    'directory': name,
+                    'file': format.defaults.get('file', '')
+                }
+    return layouts
+
+
+def getLayoutsFromResources(_format):
     layouts = {}
 
-    for directory in iterDirectoriesOfType(format.resourceType):
-
-        name = directory.__name__
-        if directory.isFile(MANIFEST_FILENAME):
-            manifest = directory.openFile(MANIFEST_FILENAME)
-            try:
-                layouts.update(getLayoutsFromManifest(manifest, format, name))
-            except:
-                logger.exception("Unable to read manifest for theme directory %s", name)
-            finally:
-                manifest.close()
-        else:
-            # can provide default file for it with no manifest
-            filename = format.defaults.get('file', '')
-            if filename and directory.isFile(filename):
-                _id = name + '/' + filename
-                if _id not in layouts:
-                    # not overridden
-                    layouts[_id] = {
-                        'title': name.capitalize().replace('-', ' ').replace('.', ' '),
-                        'description': '',
-                        'directory': name,
-                        'file': format.defaults.get('file', '')
-                    }
+    for directory in iterDirectoriesOfType(_format.resourceType):
+        layouts.update(getLayoutsFromDirectory(directory, _format))
 
     return layouts
 
