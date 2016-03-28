@@ -79,9 +79,9 @@ class PersistentTileDataManager(tiles_data.PersistentTileDataManager):
                 try:
                     data = tiles_data.decode(self.tile.request.form,
                                              self.tileType.schema, missing=True)
-                except (ValueError, UnicodeDecodeError,):
+                except (ValueError, UnicodeDecodeError):
                     logger.exception(u"Could not convert form data to schema")
-                    return self.data.copy()
+                    return {}
         return data
 
 
