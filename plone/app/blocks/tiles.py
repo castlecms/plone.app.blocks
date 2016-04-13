@@ -129,7 +129,7 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site, sm):
         contextPath = contextPath.strip('/')
         if contextPath not in contexts:
             ob = site.unrestrictedTraverse(contextPath)
-            if not checkPermission('zope2.View', ob):
+            if not sm.checkPermission('View', ob):
                 # manually check perms. We do not want restriction
                 # on traversing through an object
                 raise Unauthorized()
