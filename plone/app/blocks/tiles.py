@@ -178,7 +178,7 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site, sm):
             tileTree = utils.resolve(tileHref)
         except NotFound:
             return
-        except (RuntimeError, etree.XMLSyntaxError):
+        except (RuntimeError, etree.XMLSyntaxError, AttributeError):
             logger.info('error parsing tile url %s' % tileHref)
             return
     except (NotFound, RuntimeError):
@@ -201,7 +201,7 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site, sm):
     return tileTree
 
 
-def renderTiles(request, tree):
+def renderTiles(request, tree, baseURL=None):
     """Find all tiles in the given response, contained in the lxml element
     tree `tree`, and insert them into the output.
 
@@ -209,10 +209,11 @@ def renderTiles(request, tree):
     """
     root = tree.getroot()
     headNode = root.find('head')
-    baseURL = request.getURL()
-    if request.getVirtualRoot():
-        # plone.subrequest deals with VHM requests
-        baseURL = ''
+    if baseURL is None:
+        baseURL = request.getURL()
+        if request.getVirtualRoot():
+            # plone.subrequest deals with VHM requests
+            baseURL = ''
 
     contexts = {}
     site = api.portal.get()
