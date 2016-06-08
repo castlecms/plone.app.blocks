@@ -10,10 +10,10 @@ from plone.autoform.directives import write_permission
 from plone.autoform.interfaces import IFormFieldProvider
 from plone.memoize.ram import cache
 from plone.supermodel import model
-from plone.supermodel.directives import fieldset
 from zope import schema
 from zope.interface import alsoProvides
 from zope.interface import implements
+from plone.autoform import directives as form
 
 
 logger = logging.getLogger('plone.app.blocks')
@@ -53,6 +53,7 @@ class ILayoutAware(model.Schema):
         description=_(u'Selected content layout. If selected, custom layout is ignored.'),
         required=False)
 
+    form.mode(pageSiteLayout='hidden')
     pageSiteLayout = schema.Choice(
         title=_(u"Site layout"),
         description=_(u"Site layout to apply to this page "
@@ -62,6 +63,7 @@ class ILayoutAware(model.Schema):
     )
     write_permission(pageSiteLayout="plone.ManageSiteLayouts")
 
+    form.mode(sectionSiteLayout='hidden')
     sectionSiteLayout = schema.Choice(
         title=_(u"Section site layout"),
         description=_(u"Site layout to apply to sub-pages of this page "
@@ -70,9 +72,9 @@ class ILayoutAware(model.Schema):
         required=False
     )
     write_permission(sectionSiteLayout="plone.ManageSiteLayouts")
-
-    fieldset('layout', label=_('Layout'),
-             fields=('content', 'pageSiteLayout', 'sectionSiteLayout', 'contentLayout'))
+    #
+    # fieldset('layout', label=_('Layout'),
+    #          fields=('content', 'pageSiteLayout', 'sectionSiteLayout', 'contentLayout'))
 
 
 alsoProvides(ILayoutAware, IFormFieldProvider)

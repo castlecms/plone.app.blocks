@@ -31,11 +31,15 @@ class AvailableSiteLayoutsFactory(object):
 
         terms = []
         for filename in themeDirectory.listDirectory():
-            if filename.endswith('.html') and filename != 'index.html':
-                name = filename.replace('.html', '')
-                label = name.replace('_', ' ').capitalize()
-                terms.append(
-                    SimpleVocabulary.createTerm(filename, filename, label))
+            if filename.endswith('.html'):
+                if filename == 'index.html':
+                    terms.append(
+                        SimpleVocabulary.createTerm(filename, filename, 'Default'))
+                else:
+                    name = filename.replace('.html', '')
+                    label = name.replace('_', ' ').replace('-', ' ').capitalize()
+                    terms.append(
+                        SimpleVocabulary.createTerm(filename, filename, label))
         res = SimpleVocabulary(terms)
         if req:
             req.environ[CACHE_REQ_KEY] = res
