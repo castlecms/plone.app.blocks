@@ -58,7 +58,7 @@
 
     <!-- Register the default views for the layout behavior -->
     <browser:page
-        for=".layoutbehavior.ILayoutAware"
+        for="*"
         name="layout_view"
         class=".browser.ContentLayoutView"
         permission="zope2.View"
@@ -67,7 +67,7 @@
 
     <include package="plone.app.contentmenu" />
     <browser:menuItems
-      for=".layoutbehavior.ILayoutAware"
+      for="*"
       menu="plone_displayviews">
       <browser:menuItem
         title="Custom layout"

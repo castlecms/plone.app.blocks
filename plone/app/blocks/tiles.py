@@ -240,12 +240,11 @@ def renderTiles(request, tree, baseURL=None):
             if tileHead is None and tileBody is None:
                 tileBody = tileRoot
 
-            if tileHead is not None:
+            if tileHead is not None and headNode is not None:
                 for tileHeadChild in tileHead:
                     headNode.append(tileHeadChild)
             utils.replace_with_children(tileNode, tileBody)
         else:
             parent = tileNode.getparent()
             parent.remove(tileNode)
-
     return tree
