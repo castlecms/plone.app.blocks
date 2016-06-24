@@ -81,7 +81,7 @@ def resolveResource(url):
         directory = queryResourceDirectory(resource_type, resource_name)
         if directory:
             try:
-                return directory.readFile(path)
+                return directory.readFile(str(path))
             except NotFound:
                 pass
 
