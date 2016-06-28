@@ -18,6 +18,10 @@ def LayoutSearchableText(obj):
         text.append(obj.text.output)
     except AttributeError:
         pass
+    try:
+        text.append(obj.overview.output)
+    except AttributeError:
+        pass
 
     behavior_data = ILayoutAware(obj)
     # get data from tile data
@@ -36,9 +40,14 @@ def LayoutSearchableText(obj):
         for el in dom.cssselect('.mosaic-text-tile .mosaic-tile-content'):
             text.append(tostring(el))
 
+    subject = u' '.join(
+        [safe_unicode(s) for s in obj.Subject()]
+    )
+
     return concat(
         safe_unicode(obj.id),
         safe_unicode(obj.title) or u"",
         safe_unicode(obj.description) or u"",
-        ' '.join(text)
+        ' '.join(text),
+        safe_unicode(subject)
     )
