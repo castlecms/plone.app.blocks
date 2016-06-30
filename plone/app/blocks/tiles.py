@@ -181,7 +181,7 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site, sm):
         except (RuntimeError, etree.XMLSyntaxError, AttributeError):
             logger.info('error parsing tile url %s' % tileHref)
             return
-    except (NotFound, RuntimeError):
+    except (NotFound, RuntimeError, KeyError):
         logger.info('error parsing tile url %s' % tileHref)
         return
     except Unauthorized:
