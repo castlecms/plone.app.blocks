@@ -31,6 +31,8 @@ class AvailableSiteLayoutsFactory(object):
 
         terms = []
         for filename in themeDirectory.listDirectory():
+            if filename[0] == '_' or '_.html' in filename:
+                continue
             if filename.endswith('.html'):
                 if filename == 'index.html':
                     terms.append(
