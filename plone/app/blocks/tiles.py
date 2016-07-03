@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
-from zope.security import checkPermission
 import logging
-import traceback
 from urlparse import urljoin
 
 from AccessControl import Unauthorized
@@ -60,7 +58,8 @@ class TransientTileDataManager(tiles_data.TransientTileDataManager):
                     data = tiles_data.decode(self.tile.request.form,
                                              self.tileType.schema, missing=True)
                 except (ValueError, UnicodeDecodeError,):
-                    logger.exception(u"Could not convert form data to schema")
+                    logger.exception(u"Could not convert form data to schema",
+                                     exc_info=True)
                     return {}
         return data
 
@@ -80,7 +79,8 @@ class PersistentTileDataManager(tiles_data.PersistentTileDataManager):
                     data = tiles_data.decode(self.tile.request.form,
                                              self.tileType.schema, missing=True)
                 except (ValueError, UnicodeDecodeError):
-                    logger.exception(u"Could not convert form data to schema")
+                    logger.exception(u"Could not convert form data to schema",
+                                     exc_info=True)
                     return {}
         return data
 
@@ -88,10 +88,13 @@ class PersistentTileDataManager(tiles_data.PersistentTileDataManager):
 def _modRequest(request, query_string):
     env = request.environ.copy()
     env['QUERY_STRING'] = query_string
-    data = formparser.parse(env)
-    request.tile_data = data
-    if data.get('X-Tile-Persistent'):
-        request.tile_persistent = True
+    try:
+        data = formparser.parse(env)
+    except:
+        logger.error('Could not parse query string', exc_info=True)
+        request.tile_data = data
+        if data.get('X-Tile-Persistent'):
+            request.tile_persistent = True
 
 
 def _restoreRequest(request):
@@ -153,7 +156,8 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site, sm):
                 pass
         except:
             logger.warn('Could not check permissions of tile %s on context %s' % (
-                tileName, contextPath))
+                tileName, contextPath),
+                exc_info=True)
             return
         if tileId:
             tile.id = tileId
@@ -164,8 +168,8 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site, sm):
             logger.error(
                 'nasty uncaught tile error, data: %s,\n%s\n%s' % (
                     tileHref,
-                    repr(tileData),
-                    traceback.format_exc()))
+                    repr(tileData)),
+                exc_info=True)
             res = ERROR_TILE_RESULT
 
         if not res:
@@ -179,17 +183,16 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site, sm):
         except NotFound:
             return
         except (RuntimeError, etree.XMLSyntaxError, AttributeError):
-            logger.info('error parsing tile url %s' % tileHref)
+            logger.info('error parsing tile url %s' % tileHref, exc_info=True)
             return
     except (NotFound, RuntimeError, KeyError):
-        logger.info('error parsing tile url %s' % tileHref)
+        logger.info('error parsing tile url %s' % tileHref, exc_info=True)
         return
     except Unauthorized:
         logger.error(
             'unauthorized tile error, data: %s,\n%s\n%s' % (
                 tileHref,
-                repr(tileData),
-                traceback.format_exc()))
+                repr(tileData)), exc_info=True)
         tileTree = html.fromstring(UNAUTHORIZED_TILE_RESULT).getroottree()
     finally:
         _restoreRequest(request)
