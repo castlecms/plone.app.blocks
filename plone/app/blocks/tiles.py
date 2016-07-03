@@ -90,11 +90,11 @@ def _modRequest(request, query_string):
     env['QUERY_STRING'] = query_string
     try:
         data = formparser.parse(env)
-    except:
-        logger.error('Could not parse query string', exc_info=True)
         request.tile_data = data
         if data.get('X-Tile-Persistent'):
             request.tile_persistent = True
+    except:
+        logger.error('Could not parse query string', exc_info=True)
 
 
 def _restoreRequest(request):

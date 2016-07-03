@@ -385,7 +385,7 @@ class FormParser(object):
                     if flags & SEQUENCE:
                         try:
                             getattr(last, attr).append(item)
-                        except AttributeError:
+                        except:
                             pass
                     else:
                         new = Record()
