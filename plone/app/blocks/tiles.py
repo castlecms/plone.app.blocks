@@ -166,7 +166,7 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site, sm):
         except:
             # error rendering, let's just cut out...
             logger.error(
-                'nasty uncaught tile error, data: %s,\n%s\n%s' % (
+                'nasty uncaught tile error, data: %s,\n%s' % (
                     tileHref,
                     repr(tileData)),
                 exc_info=True)
@@ -190,7 +190,7 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site, sm):
         return
     except Unauthorized:
         logger.error(
-            'unauthorized tile error, data: %s,\n%s\n%s' % (
+            'unauthorized tile error, data: %s,\n%s' % (
                 tileHref,
                 repr(tileData)), exc_info=True)
         tileTree = html.fromstring(UNAUTHORIZED_TILE_RESULT).getroottree()
