@@ -223,16 +223,7 @@ def renderTiles(request, tree, baseURL=None):
     siteUrl = site.absolute_url()
     sm = getSecurityManager()
 
-    for tileNode in utils.headTileXPath(tree):
-        tileTree = _renderTile(request, tileNode, contexts, baseURL, siteUrl, site, sm)
-        if tileTree is not None:
-            tileRoot = tileTree.getroot()
-            utils.replace_with_children(tileNode, tileRoot.find('head'))
-        else:
-            parent = tileNode.getparent()
-            parent.remove(tileNode)
-
-    for tileNode in utils.bodyTileXPath(tree):
+    for tileNode in utils.tileXPath(tree):
         tileTree = _renderTile(request, tileNode, contexts, baseURL, siteUrl, site, sm)
         if tileTree is not None:
             tileRoot = tileTree.getroot()

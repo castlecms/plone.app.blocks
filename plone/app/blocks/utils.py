@@ -27,6 +27,7 @@ layoutXPath = etree.XPath("/html/@" + layoutAttrib)
 gridAttrib = 'data-gridsystem'
 gridXPath = etree.XPath("/html/@" + gridAttrib)
 tileAttrib = 'data-tile'
+tileXPath = etree.XPath("/html//*[@" + tileAttrib + "]")
 headTileXPath = etree.XPath("/html/head//*[@" + tileAttrib + "]")
 bodyTileXPath = etree.XPath("/html/body//*[@" + tileAttrib + "]")
 gridDataAttrib = 'data-grid'
