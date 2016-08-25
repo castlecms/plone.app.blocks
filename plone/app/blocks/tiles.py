@@ -1,23 +1,25 @@
 # -*- coding: utf-8 -*-
-import logging
-from urlparse import urljoin
-
 from AccessControl import Unauthorized
+from AccessControl.SecurityManagement import getSecurityManager
 from lxml import etree
 from lxml import html
 from plone import api
-from plone.tiles import data as tiles_data
 from plone.app.blocks import formparser
 from plone.app.blocks import utils
+from plone.tiles import data as tiles_data
 from plone.tiles.interfaces import ITile
 from plone.tiles.interfaces import ITileDataManager
+from urllib import unquote
+from urlparse import urljoin
 from zExceptions import NotFound
-from zope.component import ComponentLookupError
 from zope.component import adapter
+from zope.component import ComponentLookupError
 from zope.component import getMultiAdapter
 from zope.interface import implementer
 from zope.schema import getFields
-from AccessControl.SecurityManagement import getSecurityManager
+
+import logging
+
 
 logger = logging.getLogger('plone.app.blocks')
 
@@ -129,7 +131,7 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site, sm):
         relHref = tileHref[len(siteUrl) + 1:]
 
         contextPath, tilePart = relHref.split('@@', 1)
-        contextPath = contextPath.strip('/')
+        contextPath = unquote(contextPath.strip('/'))
         if contextPath not in contexts:
             ob = site.unrestrictedTraverse(contextPath)
             if not sm.checkPermission('View', ob):
