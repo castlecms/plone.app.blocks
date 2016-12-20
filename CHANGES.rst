@@ -1,11 +1,12 @@
 Changelog
 =========
 
-3.0.1 (unreleased)
-------------------
+10.0.27 (2016-12-20)
+--------------------
 
-- Fix the default view to report template name as 'template-layout'
-  [datakurre]
+- be able to pass in site object for tile rendering
+  [vangheem]
+
 
 3.0.0 (2015-09-16)
 ------------------

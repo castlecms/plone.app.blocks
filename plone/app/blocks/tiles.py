@@ -206,7 +206,7 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site, sm):
     return tileTree
 
 
-def renderTiles(request, tree, baseURL=None):
+def renderTiles(request, tree, baseURL=None, site=None):
     """Find all tiles in the given response, contained in the lxml element
     tree `tree`, and insert them into the output.
 
@@ -221,7 +221,8 @@ def renderTiles(request, tree, baseURL=None):
             baseURL = ''
 
     contexts = {}
-    site = api.portal.get()
+    if site is None:
+        site = api.portal.get()
     siteUrl = site.absolute_url()
     sm = getSecurityManager()
 
