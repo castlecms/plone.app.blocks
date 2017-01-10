@@ -1,6 +1,12 @@
 Changelog
 =========
 
+10.0.27 (unreleased)
+--------------------
+
+- default to bs3 grid system
+  [vangheem]
+
 10.0.27 (2016-12-20)
 --------------------
 
