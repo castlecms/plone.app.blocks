@@ -1,7 +1,7 @@
 Changelog
 =========
 
-10.0.28 (unreleased)
+10.0.28 (2017-04-04)
 --------------------
 
 - default to bs3 grid system
