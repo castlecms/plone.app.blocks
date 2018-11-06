@@ -6,10 +6,10 @@ from plone.app.testing import TEST_USER_ID
 from plone.app.testing import setRoles
 from plone.registry.interfaces import IRegistry
 from plone.uuid.interfaces import IUUID
-from zope.component import adapts
+from zope.component import adapter
 from zope.component import getGlobalSiteManager
 from zope.component import getUtility
-from zope.interface import implements
+from zope.interface import implementer
 import pkg_resources
 import unittest
 
@@ -41,9 +41,9 @@ class TestLayoutBehavior(unittest.TestCase):
         else:
             iface = self.portal['f1']['d1'].__class__
 
+        @implementer(ILayoutAware)
+        @adapter(iface)
         class DocumentLayoutAware(object):
-            implements(ILayoutAware)
-            adapts(iface)
 
             def __init__(self, context):
                 self.context = context

@@ -9,7 +9,7 @@ from plone.registry.interfaces import IRegistry
 from plone.transformchain.zpublisher import applyTransform
 from zope.component import queryUtility
 from zope.interface import alsoProvides
-from zope.interface import implements
+from zope.interface import implementer
 
 
 gridsystem_test_body = """\
@@ -30,8 +30,8 @@ gridsystem_test_body = """\
 </html>"""
 
 
+@implementer(IBlocksTransformEnabled)
 class TestTransformedView(object):
-    implements(IBlocksTransformEnabled)
 
     def __init__(self, ret_body):
         self.__call__ = lambda b=ret_body: b
@@ -47,8 +47,8 @@ class TestTransforms(unittest.TestCase):
         being dropped
         """
 
+        @implementer(IBlocksTransformEnabled)
         class TransformedView(object):
-            implements(IBlocksTransformEnabled)
 
             def __init__(self, ret_body):
                 self.__call__ = lambda b=ret_body: b
@@ -74,8 +74,8 @@ class TestTransforms(unittest.TestCase):
         quoted (and therefore broken) <![CDATA[...]]> block
         """
 
+        @implementer(IBlocksTransformEnabled)
         class TransformedView(object):
-            implements(IBlocksTransformEnabled)
 
             def __init__(self, ret_body):
                 self.__call__ = lambda b=ret_body: b

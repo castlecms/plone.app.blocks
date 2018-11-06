@@ -10,17 +10,16 @@ from plone.dexterity.browser.view import DefaultView
 from plone.outputfilters import apply_filters
 from plone.outputfilters.interfaces import IFilter
 from zope.component import getAdapters
-from zope.interface import implements
+from zope.interface import implementer
 
 
 panel_xpath = etree.XPath("//*[@data-panel]")
 
 
+@implementer(IBlocksTransformEnabled)
 class ContentLayoutView(DefaultView):
     """Default view for a layout aware page
     """
-
-    implements(IBlocksTransformEnabled)
 
     def get_layout(self):
         layout = getLayout(self.context)

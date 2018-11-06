@@ -2,7 +2,6 @@
 import logging
 
 from AccessControl import getSecurityManager
-import Globals
 from lxml import etree
 from lxml import html
 from plone.app.blocks.interfaces import DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY
@@ -116,7 +115,7 @@ def xpath1(xpath, node, strict=True):
     """Return a single node matched by the given etree.XPath object.
     """
 
-    if isinstance(xpath, basestring):
+    if isinstance(xpath, str):
         xpath = etree.XPath(xpath)
 
     result = xpath(node)
@@ -207,7 +206,7 @@ def _getWidgetName(field, widgets, request):
         factory = widgets[field.__name__]
     else:
         factory = getMultiAdapter((field, request), IFieldWidget)
-    if isinstance(factory, basestring):
+    if isinstance(factory, str):
         return factory
     if not isinstance(factory, type):
         factory = factory.__class__
@@ -216,15 +215,16 @@ def _getWidgetName(field, widgets, request):
 
 def isVisible(name, omitted):
     value = omitted.get(name, False)
-    if isinstance(value, basestring):
+    if isinstance(value, str):
         return value == 'false'
     else:
         return not bool(value)
 
 
 def cacheKey(func, rules_url, theme_node):
-    if Globals.DevelopmentMode:
-        raise DontCache()
+    # XXX
+    # if Globals.DevelopmentMode:
+    #     raise DontCache()
     return ':'.join([rules_url, html.tostring(theme_node)])
 
 

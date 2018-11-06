@@ -44,7 +44,7 @@ $Id: $
 __docformat__ = 'restructuredtext'
 
 from cgi import FieldStorage
-from cStringIO import StringIO
+from io import StringIO
 import re
 from zope.interface.common.mapping import IExtendedReadMapping
 
@@ -54,7 +54,7 @@ array_types = (list, tuple)
 
 
 def field2string(v):
-    if not isinstance(v, basestring):
+    if not isinstance(v, str):
         if hasattr(v, 'value'):
             v = v.value
         else:
@@ -304,7 +304,7 @@ class FormParser(object):
         if key is not None:
             key = self._to_unicode(key)
 
-        if isinstance(item, basestring):
+        if isinstance(item, str):
             item = self._to_unicode(item)
 
         if tuple_item:

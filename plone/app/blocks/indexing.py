@@ -33,7 +33,7 @@ def LayoutSearchableText(obj):
                 continue
             for field_name in ('title', 'label', 'content'):
                 val = data.get(field_name)
-                if isinstance(val, basestring):
+                if isinstance(val, str):
                     text.append(val)
     if not behavior_data.contentLayout and behavior_data.content:
         dom = fromstring(behavior_data.content)

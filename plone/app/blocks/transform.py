@@ -6,11 +6,12 @@ from plone.app.blocks import gridsystem
 from plone.transformchain.interfaces import ITransform
 from repoze.xmliter.serializer import XMLSerializer
 from repoze.xmliter.utils import getHTMLSerializer
-from zope.interface import implements
+from zope.interface import implementer
 
 import re
 
 
+@implementer(ITransform)
 class ParseXML(object):
     """First stage in the 8000's chain: parse the content to an lxml tree
     encapsulated in an XMLSerializer.
@@ -20,8 +21,6 @@ class ParseXML(object):
     the option to parse the content here, and if we decide it's not HTML,
     we can avoid trying to parse it again.
     """
-
-    implements(ITransform)
 
     order = 8000
 
@@ -75,13 +74,12 @@ class ParseXML(object):
             return None
 
 
+@implementer(ITransform)
 class ApplyResponsiveClass(object):
     """Turn a panel-merged page into the final composition by including tiles.
     Assumes the input result is an lxml tree and returns an lxml tree for
     later serialization.
     """
-
-    implements(ITransform)
 
     order = 8900
 

@@ -12,7 +12,7 @@ from plone.memoize.ram import cache
 from plone.supermodel import model
 from zope import schema
 from zope.interface import alsoProvides
-from zope.interface import implements
+from zope.interface import implementer, Interface
 from plone.autoform import directives as form
 
 
@@ -30,11 +30,10 @@ Could not find layout for content
 </html>"""
 
 
+@implementer(ILayoutField)
 class LayoutField(schema.Text):
     """A field used to store layout information
     """
-
-    implements(ILayoutField)
 
 
 class ILayoutAware(model.Schema):
@@ -103,3 +102,8 @@ def applyTilePersistent(path, resolved):
                 url += '?X-Tile-Persistent=yes'
         node.attrib[tileAttrib] = url
     return html.tostring(tree)
+
+
+class ILayoutBehaviorAdaptable(Interface):
+    """Marker Interface for ILayoutAware adaptable content
+    """

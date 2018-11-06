@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-from urllib import urlencode
-from urlparse import urljoin
-from urlparse import urlparse
-from urlparse import parse_qs
-from urlparse import urlunparse
+from urllib.parse import urlencode
+from urllib.parse import urljoin
+from urllib.parse import urlparse
+from urllib.parse import parse_qs
+from urllib.parse import urlunparse
 
 from plone.app.blocks import utils
 

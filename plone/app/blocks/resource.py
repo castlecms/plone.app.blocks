@@ -1,24 +1,23 @@
 # -*- coding: utf-8 -*-
-from ConfigParser import SafeConfigParser
+from configparser import SafeConfigParser
 import logging
 
-import Globals
 from Products.CMFCore.utils import getToolByName
 from plone.app.blocks.interfaces import CONTENT_LAYOUT_FILE_NAME
 from plone.app.blocks.interfaces import CONTENT_LAYOUT_MANIFEST_FORMAT
 from plone.app.blocks.interfaces import CONTENT_LAYOUT_RESOURCE_NAME
 from plone.memoize import view
-from plone.memoize import volatile
 from plone.resource.manifest import MANIFEST_FILENAME
 from plone.resource.traversal import ResourceTraverser
 from plone.resource.utils import iterDirectoriesOfType
 from zope.annotation import IAnnotations
 from zope.globalrequest import getRequest
-from zope.interface import implements
+from zope.interface import implementer
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm
 from zope.schema.vocabulary import SimpleVocabulary
 from zope.dottedname.resolve import resolve
+from io import StringIO
 
 
 logger = logging.getLogger('plone.app.blocks')
@@ -34,10 +33,10 @@ class ContentLayoutTraverser(ResourceTraverser):
     name = CONTENT_LAYOUT_RESOURCE_NAME
 
 
+@implementer(IAnnotations)
 class AnnotationsDict(dict):
     """Volatile annotations dictionary to pass to view.memoize_contextless when
     request thread local is not set"""
-    implements(IAnnotations)
 
 
 class multidict(dict):
@@ -54,11 +53,13 @@ class multidict(dict):
 
 
 def getLayoutsFromManifest(fp, format, directory_name):
-    parser = SafeConfigParser(None, multidict)
-    parser.readfp(fp)
+    parser = SafeConfigParser(None, multidict, strict=False)
+    # need to translate into stringio
+    strfi = StringIO(fp.read().decode('utf-8'))
+    parser.readfp(strfi)
 
     if parser.has_section('config1'):
-        layer = parser.get('config1', 'layer', '')
+        layer = parser.get('config1', 'layer')
         if layer:
             req = getRequest()
             layer = resolve(layer)
@@ -99,7 +100,7 @@ def getLayoutsFromDirectory(directory, _format):
         manifest = directory.openFile(MANIFEST_FILENAME)
         try:
             layouts.update(getLayoutsFromManifest(manifest, _format, name))
-        except:
+        except Exception:
             logger.exception(
                 "Unable to read manifest for theme directory %s", name)
         finally:
@@ -129,11 +130,10 @@ def getLayoutsFromResources(_format):
     return layouts
 
 
+@implementer(IVocabularyFactory)
 class _AvailableLayoutsVocabulary(object):
     """Vocabulary to return request cached available layouts of a given type
     """
-
-    implements(IVocabularyFactory)
 
     def __init__(self):
         self.request = getRequest() or AnnotationsDict()
@@ -161,11 +161,10 @@ class _AvailableLayoutsVocabulary(object):
         return SimpleVocabulary(items)
 
 
+@implementer(IVocabularyFactory)
 class AvailableLayoutsVocabulary(object):
     """Vocabulary to return available layouts of a given type
     """
-
-    implements(IVocabularyFactory)
 
     def __init__(self, format, defaultFilename):
         self.format = format
@@ -188,8 +187,9 @@ def cacheKey(method, self):
     or the content is modified
     """
 
-    if Globals.DevelopmentMode:
-        raise volatile.DontCache()
+    # XXX
+    # if Globals.DevelopmentMode:
+    #     raise volatile.DontCache()
 
     catalog = getToolByName(self.context, 'portal_catalog')
 

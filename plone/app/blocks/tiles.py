@@ -9,8 +9,8 @@ from plone.app.blocks import utils
 from plone.tiles import data as tiles_data
 from plone.tiles.interfaces import ITile
 from plone.tiles.interfaces import ITileDataManager
-from urllib import unquote
-from urlparse import urljoin
+from urllib.parse import unquote
+from urllib.parse import urljoin
 from zExceptions import NotFound
 from zope.component import adapter
 from zope.component import ComponentLookupError
