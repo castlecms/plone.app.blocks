@@ -230,8 +230,9 @@ def renderTiles(request, tree, baseURL=None, site=None):
         tileTree = _renderTile(request, tileNode, contexts, baseURL, siteUrl, site, sm)
         if tileTree is not None:
             tileRoot = tileTree.getroot()
-            content = (tileRoot.find('head') is not None or
-                       tileRoot.find('body') is not None)
+            content = tileRoot.find('head')
+            if content is None:
+                content = tileRoot.find('body')
             utils.replace_with_children(tileNode, content)
         else:
             parent = tileNode.getparent()
