@@ -40,7 +40,7 @@ class ParseXML(object):
     def transformIterable(self, result, encoding):
         try:
             # We do NOT want to transform File responses since these can be layouts
-            if isinstance(self.published.im_self, File):
+            if isinstance(self.published.__self__, File):
                 self.request['plone.app.blocks.disabled'] = True
                 return None
         except AttributeError:
@@ -61,13 +61,13 @@ class ParseXML(object):
         try:
             # Fix layouts with CR[+LF] line endings not to lose their heads
             # (this has been seen with downloaded themes with CR[+LF] endings)
-            iterable = [re.sub('&#13;', '\n', re.sub('&#13;\n', '\n', item))
+            iterable = [re.sub(b'&#13;', b'\n', re.sub(b'&#13;\n', b'\n', item))
                         for item in result if item]
             result = getHTMLSerializer(
                 iterable, pretty_print=self.pretty_print, encoding=encoding)
-            # Fix XHTML layouts with where etree.tostring breaks <![CDATA[
-            if any(['<![CDATA[' in item for item in iterable]):
-                result.serializer = html.tostring
+            # We are going to force html output here always as XHTML
+            # output does odd character encodings
+            result.serializer = html.tostring
             self.request['plone.app.blocks.enabled'] = True
             return result
         except (AttributeError, TypeError, etree.ParseError):
