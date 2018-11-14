@@ -68,7 +68,7 @@ class TransientTileDataManager(tiles_data.TransientTileDataManager):
 
 class PersistentTileDataManager(tiles_data.PersistentTileDataManager):
 
-    def _get_default_request_data(self):
+    def get_default_request_data(self):
         if hasattr(self.tile.request, 'tile_data'):
             data = self.tile.request.tile_data
         else:
@@ -95,7 +95,7 @@ def _modRequest(request, query_string):
         request.tile_data = data
         if data.get('X-Tile-Persistent'):
             request.tile_persistent = True
-    except:
+    except Exception:
         logger.error('Could not parse query string', exc_info=True)
 
 
