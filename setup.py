@@ -53,6 +53,7 @@ setup(
         'Acquisition',
         'diazo',
         'lxml',
+        'plone.api',
         'plone.app.layout',
         'plone.app.registry',
         'plone.autoform',

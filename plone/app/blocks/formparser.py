@@ -168,9 +168,12 @@ RECORDS = 8
 REC = RECORD | RECORDS
 CONVERTED = 32
 
+
 def decode_utf8(s):
     """Decode a UTF-8 string"""
-    return unicode(s, 'utf-8')
+    if isinstance(s, bytes):
+        s = s.decode('utf-8')
+    return s
 
 
 def _remove_mini_storage_wrapper(value):

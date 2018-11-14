@@ -156,7 +156,7 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site, sm):
                 return
             else:
                 pass
-        except:
+        except Exception:
             logger.warn('Could not check permissions of tile %s on context %s' % (
                 tileName, contextPath),
                 exc_info=True)
@@ -165,7 +165,7 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site, sm):
             tile.id = tileId
         try:
             res = tile()
-        except:
+        except Exception:
             # error rendering, let's just cut out...
             logger.error(
                 'nasty uncaught tile error, data: %s,\n%s' % (
@@ -230,7 +230,8 @@ def renderTiles(request, tree, baseURL=None, site=None):
         tileTree = _renderTile(request, tileNode, contexts, baseURL, siteUrl, site, sm)
         if tileTree is not None:
             tileRoot = tileTree.getroot()
-            content = tileRoot.find('head') or tileRoot.find('body')
+            content = (tileRoot.find('head') is not None or
+                       tileRoot.find('body') is not None)
             utils.replace_with_children(tileNode, content)
         else:
             parent = tileNode.getparent()

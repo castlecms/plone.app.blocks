@@ -2,20 +2,17 @@
 import logging
 
 from AccessControl import getSecurityManager
-from lxml import etree
-from lxml import html
+from lxml import etree, html
+from plone import api
 from plone.app.blocks.interfaces import DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY
-from plone.app.blocks.layoutbehavior import ILayoutAware
-from plone.app.blocks.layoutbehavior import applyTilePersistent
+from plone.app.blocks.layoutbehavior import ILayoutAware, applyTilePersistent
 from plone.memoize.volatile import DontCache
 from plone.registry.interfaces import IRegistry
 from plone.resource.utils import queryResourceDirectory
 from plone.subrequest import subrequest
 from z3c.form.interfaces import IFieldWidget
 from zExceptions import NotFound
-from zope.component import getMultiAdapter
-from zope.component import getUtility
-from zope.component import queryUtility
+from zope.component import getMultiAdapter, getUtility, queryUtility
 from zope.security.interfaces import IPermission
 from zope.site.hooks import getSite
 
@@ -59,7 +56,7 @@ def resolve(url, resolved=None):
     if not resolved.strip():
         return None
     try:
-        if isinstance(resolved, unicode):
+        if isinstance(resolved, str):
             html_parser = html.HTMLParser(encoding='utf-8')
             return html.fromstring(resolved.encode('utf-8'),
                                    parser=html_parser).getroottree()
@@ -222,9 +219,8 @@ def isVisible(name, omitted):
 
 
 def cacheKey(func, rules_url, theme_node):
-    # XXX
-    # if Globals.DevelopmentMode:
-    #     raise DontCache()
+    if api.env.debug_mode():
+        raise DontCache()
     return ':'.join([rules_url, html.tostring(theme_node)])
 
 
@@ -254,4 +250,6 @@ def getLayout(content):
             layout = applyTilePersistent(path, resolved)
         except (KeyError, NotFound, RuntimeError):
             pass
+    if isinstance(layout, bytes):
+        layout = layout.decode('utf-8')
     return layout

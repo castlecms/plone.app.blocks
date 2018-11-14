@@ -1,24 +1,23 @@
 # -*- coding: utf-8 -*-
-from configparser import SafeConfigParser
 import logging
+from configparser import SafeConfigParser
+from io import StringIO
 
-from Products.CMFCore.utils import getToolByName
-from plone.app.blocks.interfaces import CONTENT_LAYOUT_FILE_NAME
-from plone.app.blocks.interfaces import CONTENT_LAYOUT_MANIFEST_FORMAT
-from plone.app.blocks.interfaces import CONTENT_LAYOUT_RESOURCE_NAME
-from plone.memoize import view
+from plone import api
+from plone.app.blocks.interfaces import (CONTENT_LAYOUT_FILE_NAME,
+                                         CONTENT_LAYOUT_MANIFEST_FORMAT,
+                                         CONTENT_LAYOUT_RESOURCE_NAME)
+from plone.memoize import view, volatile
 from plone.resource.manifest import MANIFEST_FILENAME
 from plone.resource.traversal import ResourceTraverser
 from plone.resource.utils import iterDirectoriesOfType
+from Products.CMFCore.utils import getToolByName
 from zope.annotation import IAnnotations
+from zope.dottedname.resolve import resolve
 from zope.globalrequest import getRequest
 from zope.interface import implementer
 from zope.schema.interfaces import IVocabularyFactory
-from zope.schema.vocabulary import SimpleTerm
-from zope.schema.vocabulary import SimpleVocabulary
-from zope.dottedname.resolve import resolve
-from io import StringIO
-
+from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
 logger = logging.getLogger('plone.app.blocks')
 
@@ -187,9 +186,8 @@ def cacheKey(method, self):
     or the content is modified
     """
 
-    # XXX
-    # if Globals.DevelopmentMode:
-    #     raise volatile.DontCache()
+    if api.env.debug_mode:
+        raise volatile.DontCache()
 
     catalog = getToolByName(self.context, 'portal_catalog')
 
