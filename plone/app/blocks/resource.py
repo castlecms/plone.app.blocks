@@ -186,7 +186,7 @@ def cacheKey(method, self):
     or the content is modified
     """
 
-    if api.env.debug_mode:
+    if api.env.debug_mode():
         raise volatile.DontCache()
 
     catalog = getToolByName(self.context, 'portal_catalog')
