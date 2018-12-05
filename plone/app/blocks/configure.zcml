@@ -144,8 +144,25 @@
              zope.lifecycleevent.interfaces.IObjectModifiedEvent"
         handler=".subscribers.onLayoutEdited" />
 
-
     <!-- plone.tiles overrides here! -->
+    <view
+        for="plone.tiles.interfaces.ITile"
+        name="absolute_url"
+        factory=".absoluteurl.TransientTileAbsoluteURL"
+        type="zope.publisher.interfaces.http.IHTTPRequest"
+        permission="zope.Public"
+        allowed_interface="zope.traversing.browser.interfaces.IAbsoluteURL"
+        layer=".interfaces.IBlocksLayer"
+        />
+    <view
+        for="plone.tiles.interfaces.ITile"
+        factory=".absoluteurl.TransientTileAbsoluteURL"
+        type="zope.publisher.interfaces.http.IHTTPRequest"
+        permission="zope.Public"
+        provides="zope.traversing.browser.interfaces.IAbsoluteURL"
+        layer=".interfaces.IBlocksLayer"
+        />
+
     <include package="z3c.unconfigure" file="meta.zcml" />
     <unconfigure>
         <adapter factory="plone.tiles.data.transientTileDataManagerFactory" />

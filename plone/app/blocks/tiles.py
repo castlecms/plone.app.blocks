@@ -17,6 +17,8 @@ from zope.component import ComponentLookupError
 from zope.component import getMultiAdapter
 from zope.interface import implementer
 from zope.schema import getFields
+from urlparse import parse_qs
+import json
 
 import logging
 
@@ -39,16 +41,14 @@ class TransientTileDataManager(tiles_data.TransientTileDataManager):
         # use explicitly set data (saved as annotation on the request)
         if self.key in self.annotations:
             data = dict(self.annotations[self.key])
-
-            if self.tileType is not None and self.tileType.schema is not None:
-                for name, field in getFields(self.tileType.schema).items():
-                    if name not in data:
-                        data[name] = field.missing_value
-
         # try to use a '_tiledata' parameter in the request
         elif hasattr(self.tile.request, 'tile_data'):
             data = self.tile.request.tile_data
-
+        elif '_tiledata' in self.tile.request.form:
+            try:
+                data = json.loads(self.tile.request.form['_tiledata'])
+            except Exception:
+                pass
         # fall back to the copy of request.form object itself
         else:
             # If we don't have a schema, just take the request
@@ -63,6 +63,10 @@ class TransientTileDataManager(tiles_data.TransientTileDataManager):
                     logger.exception(u"Could not convert form data to schema",
                                      exc_info=True)
                     return {}
+        if self.tileType is not None and self.tileType.schema is not None:
+            for name, field in getFields(self.tileType.schema).items():
+                if name not in data:
+                    data[name] = field.missing_value
         return data
 
 
@@ -87,16 +91,30 @@ class PersistentTileDataManager(tiles_data.PersistentTileDataManager):
         return data
 
 
-def _modRequest(request, query_string):
+def parse_formdata(request, qs):
     env = request.environ.copy()
-    env['QUERY_STRING'] = query_string
+    env['QUERY_STRING'] = qs
     try:
         data = formparser.parse(env)
-        request.tile_data = data
-        if data.get('X-Tile-Persistent'):
-            request.tile_persistent = True
-    except:
+    except Exception:
         logger.error('Could not parse query string', exc_info=True)
+        data = {}
+    return data
+
+
+def _modRequest(request, query_string):
+    data = {}
+    if '_tiledata=' in query_string:
+        try:
+            qdata = parse_qs(query_string)
+            data = json.loads(qdata['_tiledata'])
+        except Exception:
+            logger.error('Could not parse _tiledata', exc_info=True)
+    else:
+        data = parse_formdata(request, query_string)
+    request.tile_data = data
+    if data.get('X-Tile-Persistent'):
+        request.tile_persistent = True
 
 
 def _restoreRequest(request):
@@ -156,7 +174,7 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site, sm):
                 return
             else:
                 pass
-        except:
+        except Exception:
             logger.warn('Could not check permissions of tile %s on context %s' % (
                 tileName, contextPath),
                 exc_info=True)
