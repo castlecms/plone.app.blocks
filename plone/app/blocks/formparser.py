@@ -44,7 +44,7 @@ $Id: $
 __docformat__ = 'restructuredtext'
 
 from cgi import FieldStorage
-from io import StringIO
+from io import BytesIO
 import re
 from zope.interface.common.mapping import IExtendedReadMapping
 
@@ -108,7 +108,7 @@ def field2long(v):
     if not v:
         raise ValueError('Empty entry when integer expected')
     try:
-        return long(v)
+        return int(v)
     except ValueError:
         raise ValueError("A long integer was expected in the value '%s'" % v)
 
@@ -131,16 +131,16 @@ def field2boolean(v):
 
 
 type_converters = {
-    'float':    field2float,
-    'int':      field2int,
-    'long':     field2long,
-    'string':   field2string,
+    'float': field2float,
+    'int': field2int,
+    'long': field2long,
+    'string': field2string,
     'required': field2required,
-    'tokens':   field2tokens,
-    'lines':    field2lines,
-    'text':     field2text,
-    'boolean':  field2boolean,
-    }
+    'tokens': field2tokens,
+    'lines': field2lines,
+    'text': field2text,
+    'boolean': field2boolean,
+}
 
 get_converter = type_converters.get
 
@@ -157,7 +157,8 @@ def registerTypeConverter(field_type, converter, replace=False):
 
     type_converters[field_type] = converter
 
-_type_format = re.compile('([a-zA-Z][a-zA-Z0-9_]+|\\.[xy])$')
+
+_type_format = re.compile(r'([a-zA-Z][a-zA-Z0-9_]+|\\.[xy])$')
 
 
 # Flag Constants
@@ -217,7 +218,7 @@ class FormParser(object):
         if 'QUERY_STRING' not in self._env:
             self._env['QUERY_STRING'] = ''
 
-        fp = StringIO('')
+        fp = BytesIO('')
 
         fs = TempFieldStorage(fp=fp, environ=self._env,
                               keep_blank_values=1)
@@ -286,8 +287,8 @@ class FormParser(object):
                     self.action = self._to_unicode(key)
                 else:
                     self.action = self._to_unicode(item)
-            elif (type_name == 'default_method'
-                    or type_name == 'default_action') and not self.action:
+            elif (type_name == 'default_method' or
+                  type_name == 'default_action') and not self.action:
                 if key:
                     self.action = self._to_unicode(key)
                 else:
@@ -340,7 +341,7 @@ class FormParser(object):
         if flags & CONVERTED:
             try:
                 item = converter(item)
-            except:
+            except Exception:
                 if item or flags & DEFAULT or key not in self._defaults:
                     raise
                 item = self._defaults[key]
@@ -388,7 +389,7 @@ class FormParser(object):
                     if flags & SEQUENCE:
                         try:
                             getattr(last, attr).append(item)
-                        except:
+                        except Exception:
                             pass
                     else:
                         new = Record()
@@ -484,7 +485,7 @@ class TempFieldStorage(FieldStorage):
     """FieldStorage that stores uploads in temporary files"""
 
     def make_file(self, binary=None):
-        return StringIO()
+        return BytesIO()
 
 
 def parse(env, to_unicode=decode_utf8):
