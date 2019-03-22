@@ -218,7 +218,7 @@ class FormParser(object):
         if 'QUERY_STRING' not in self._env:
             self._env['QUERY_STRING'] = ''
 
-        fp = BytesIO('')
+        fp = BytesIO(b'')
 
         fs = TempFieldStorage(fp=fp, environ=self._env,
                               keep_blank_values=1)
