@@ -88,10 +88,10 @@ class PersistentTileDataManager(tiles_data.PersistentTileDataManager):
 
 
 def _modRequest(request, query_string):
-    env = request.environ.copy()
-    env['QUERY_STRING'] = query_string
     try:
-        data = formparser.parse(env)
+        data = formparser.parse({
+            'QUERY_STRING': query_string
+        })
         request.tile_data = data
         if data.get('X-Tile-Persistent'):
             request.tile_persistent = True
