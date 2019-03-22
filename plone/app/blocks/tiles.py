@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+import logging
+
 from AccessControl import Unauthorized
 from AccessControl.SecurityManagement import getSecurityManager
 from lxml import etree
@@ -9,16 +11,20 @@ from plone.app.blocks import utils
 from plone.tiles import data as tiles_data
 from plone.tiles.interfaces import ITile
 from plone.tiles.interfaces import ITileDataManager
-from urllib.parse import unquote
-from urllib.parse import urljoin
 from zExceptions import NotFound
-from zope.component import adapter
 from zope.component import ComponentLookupError
+from zope.component import adapter
 from zope.component import getMultiAdapter
 from zope.interface import implementer
 from zope.schema import getFields
 
-import logging
+
+try:
+    from urllib.parse import unquote
+    from urllib.parse import urljoin
+except ImportError:
+    from urllib import unquote
+    from urlparse import urljoin
 
 
 logger = logging.getLogger('plone.app.blocks')

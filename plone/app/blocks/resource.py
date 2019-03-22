@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 import logging
-from configparser import SafeConfigParser
 from io import StringIO
 
 from plone import api
-from plone.app.blocks.interfaces import (CONTENT_LAYOUT_FILE_NAME,
-                                         CONTENT_LAYOUT_MANIFEST_FORMAT,
-                                         CONTENT_LAYOUT_RESOURCE_NAME)
-from plone.memoize import view, volatile
+from plone.app.blocks.interfaces import CONTENT_LAYOUT_FILE_NAME
+from plone.app.blocks.interfaces import CONTENT_LAYOUT_MANIFEST_FORMAT
+from plone.app.blocks.interfaces import CONTENT_LAYOUT_RESOURCE_NAME
+from plone.memoize import view
+from plone.memoize import volatile
 from plone.resource.manifest import MANIFEST_FILENAME
 from plone.resource.traversal import ResourceTraverser
 from plone.resource.utils import iterDirectoriesOfType
@@ -17,9 +17,16 @@ from zope.dottedname.resolve import resolve
 from zope.globalrequest import getRequest
 from zope.interface import implementer
 from zope.schema.interfaces import IVocabularyFactory
-from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
+from zope.schema.vocabulary import SimpleTerm
+from zope.schema.vocabulary import SimpleVocabulary
+
 
 logger = logging.getLogger('plone.app.blocks')
+
+try:
+    from configparser import SafeConfigParser
+except ImportError:
+    from ConfigParser import SafeConfigParser
 
 
 class ContentLayoutTraverser(ResourceTraverser):
