@@ -59,7 +59,10 @@ class multidict(dict):
 
 
 def getLayoutsFromManifest(fp, format, directory_name):
-    parser = SafeConfigParser(None, multidict, strict=False)
+    try:
+        parser = SafeConfigParser(None, multidict, strict=False)
+    except TypeError:
+        parser = SafeConfigParser(None, multidict)
     # need to translate into stringio
     strfi = StringIO(fp.read().decode('utf-8'))
     parser.readfp(strfi)
