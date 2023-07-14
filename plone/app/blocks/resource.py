@@ -2,7 +2,8 @@
 from ConfigParser import SafeConfigParser
 import logging
 
-import Globals
+# Plone5.2 - 'Globals' no longer exists in Zope4
+# import Globals
 from Products.CMFCore.utils import getToolByName
 from plone.app.blocks.interfaces import CONTENT_LAYOUT_FILE_NAME
 from plone.app.blocks.interfaces import CONTENT_LAYOUT_MANIFEST_FORMAT
@@ -188,8 +189,9 @@ def cacheKey(method, self):
     or the content is modified
     """
 
-    if Globals.DevelopmentMode:
-        raise volatile.DontCache()
+    # Plone5.2 - 'Globals' no longer exists. Remove for now?
+    # if Globals.DevelopmentMode:
+    #     raise volatile.DontCache()
 
     catalog = getToolByName(self.context, 'portal_catalog')
 

@@ -2,7 +2,8 @@
 import logging
 
 from AccessControl import getSecurityManager
-import Globals
+# Plone5.2 - 'Globals' no longer exists in Zope4
+# import Globals
 from lxml import etree
 from lxml import html
 from plone.app.blocks.interfaces import DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY
@@ -223,8 +224,9 @@ def isVisible(name, omitted):
 
 
 def cacheKey(func, rules_url, theme_node):
-    if Globals.DevelopmentMode:
-        raise DontCache()
+    # Plone5.2 - 'Globals' no longer exists. Remove for now?
+    # if Globals.DevelopmentMode:
+    #     raise DontCache()
     return ':'.join([rules_url, html.tostring(theme_node)])
 
 
