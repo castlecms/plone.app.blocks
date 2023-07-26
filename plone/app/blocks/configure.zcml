@@ -95,32 +95,7 @@
         i18n:translate="title"
         />
    </browser:menuItems>
-        for=".layoutbehavior.ILayoutBehaviorAdaptable"
-        name="tile_layout_view"
-        class=".layoutviews.TileLayoutView"
-        permission="cmf.ModifyPortalContent"
-        />
-    <browser:page
-        for=".layoutbehavior.ILayoutBehaviorAdaptable"
-        name="layout_view"
-        class=".layoutviews.ContentLayoutView"
-        permission="zope2.View"
-        />
-    <browser:page
-        for=".layoutbehavior.ILayoutBehaviorAdaptable"
-        name="layout_preview"
-        class=".layoutviews.ContentLayoutPreview"
-        permission="cmf.ModifyPortalContent"
-        zcml:condition="installed plone.app.drafts"
-        />
 
-    <!-- Register the resource traverser -->
-    <adapter
-        name="sitelayout"
-        for="* zope.publisher.interfaces.IRequest"
-        provides="zope.traversing.interfaces.ITraversable"
-        factory=".resource.SiteLayoutTraverser"
-        />
 
     <!-- Register resource traverser for content layouts -->
     <adapter
@@ -151,20 +126,6 @@
         name="deco"
         />
 
-    <!-- 8000: Turn the response into an lxml tree for further manipulation -->
-    <adapter
-        for="* *"
-        name="plone.app.blocks.parsexml"
-        factory=".transform.ParseXML"
-        />
-
-    <!-- 8700: Replace css classes -->
-    <adapter
-        for="* *"
-        name="plone.app.blocks.gridsystem"
-        factory=".transform.ApplyResponsiveClass"
-        />
-
     <!-- patches -->
     <include package="collective.monkeypatcher" />
     <monkey:patch
@@ -179,11 +140,6 @@
         name="plone.availableSiteLayouts"
         />
 
-    <!-- Register vocabulary -->
-    <utility
-        component=".resource.AvailableSiteLayoutsVocabularyFactory"
-        name="plone.availableSiteLayouts"
-        />
 
     <!-- Register vocabulary all available content layouts-->
     <utility
@@ -191,27 +147,6 @@
         name="plone.availableContentLayouts"
         />
 
-    <!-- Cache invalidation when global site layout changes -->
-    <subscriber
-        handler=".resource.globalSiteLayoutModified"
-        />
-
-    <!-- Register indirection views for looking up the layout -->
-    <browser:view
-        name="default-site-layout"
-        for="*"
-        permission="zope.Public"
-        class=".resource.DefaultSiteLayout"
-        />
-
-    <browser:view
-        name="page-site-layout"
-        for="*"
-        permission="zope.Public"
-        class=".resource.PageSiteLayout"
-        />
-
-    <!-- The transform pipeline -->
 
     <!-- 8000: Turn the response into an lxml tree for further manipulation -->
     <adapter

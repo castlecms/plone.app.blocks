@@ -8,6 +8,8 @@ from zope.interface import Interface
 CONTENT_LAYOUT_RESOURCE_NAME = 'contentlayout'
 CONTENT_LAYOUT_FILE_NAME = "content.html"
 DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY = 'plone.app.blocks.default_layout'
+DEFAULT_AJAX_LAYOUT_REGISTRY_KEY = "plone.defaultAjaxLayout"
+DEFAULT_SITE_LAYOUT_REGISTRY_KEY = "plone.defaultSiteLayout"
 
 CONTENT_LAYOUT_MANIFEST_FORMAT = ManifestFormat(
     CONTENT_LAYOUT_RESOURCE_NAME,
@@ -76,16 +78,16 @@ class IOmittedField(Interface):
 #         """Return the layout as a str value"""
 
 
-class IBaseTileRenderEvent(Interface):
-    """Base class for tile render events."""
+# class IBaseTileRenderEvent(Interface):
+#     """Base class for tile render events."""
 
-    tile_href = Attribute("URL of the rendered tile")
-    tile_node = Attribute("LXML.html node on which the tile is called")
-
-
-class IBeforeTileRenderEvent(IBaseTileRenderEvent):
-    """Thrown before a tile is rendered."""
+#     tile_href = Attribute("URL of the rendered tile")
+#     tile_node = Attribute("LXML.html node on which the tile is called")
 
 
-class IAfterTileRenderEvent(IBaseTileRenderEvent):
-    """Thrown after a tile is rendered."""
+# class IBeforeTileRenderEvent(IBaseTileRenderEvent):
+#     """Thrown before a tile is rendered."""
+
+
+# class IAfterTileRenderEvent(IBaseTileRenderEvent):
+#     """Thrown after a tile is rendered."""

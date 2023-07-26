@@ -2,9 +2,9 @@ from lxml import etree
 from lxml.html import tostring
 from lxml.html import fromstring
 from plone.app.theming.utils import theming_policy
-from plone.app.blocks.layoutbehavior import ERROR_LAYOUT
+from plone.app.blocks.layoutviews import ERROR_LAYOUT
 from plone.app.blocks.interfaces import IBlocksTransformEnabled
-from plone.app.blocks.utils import getLayout
+from plone.app.blocks.layoutbehavior import getLayout
 from castle.cms.theming import renderWithTheme
 from plone.dexterity.browser.view import DefaultView
 from plone.outputfilters import apply_filters

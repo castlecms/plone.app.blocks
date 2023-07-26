@@ -25,7 +25,6 @@ from zope.security.interfaces import IPermission
 # Legacy imports
 from plone.app.blocks.interfaces import DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY
 from plone.app.blocks.layoutbehavior import ILayoutAware
-from plone.app.blocks.layoutbehavior import applyTilePersistent
 from zope.component import getUtility
 from plone.registry.interfaces import IRegistry
 
@@ -282,6 +281,25 @@ def cacheKey(func, rules_url, theme_node):
     key.update(rules_url)
     key.update(html.tostring(theme_node))
     return key.hexdigest()
+
+
+@ram.cache(lambda fun, path, resolved: md5(resolved).hexdigest())
+def applyTilePersistent(path, resolved):
+    """Append X-Tile-Persistent into resolved layout's tile URLs to allow
+    context specific tile configuration overrides.
+
+    (Path is required for proper error message when lxml parser fails.)
+    """
+    tree = resolve(path, resolved=resolved)
+    for node in bodyTileXPath(tree):
+        url = node.attrib[tileAttrib]
+        if "X-Tile-Persistent" not in url:
+            if "?" in url:
+                url += "&X-Tile-Persistent=yes"
+            else:
+                url += "?X-Tile-Persistent=yes"
+        node.attrib[tileAttrib] = url
+    return html.tostring(tree, encoding="unicode")
 
 
 def getLayout(content):
