@@ -39,22 +39,53 @@ class IBlocksTransformEnabled(Interface):
 
 
 class IBlocksSettings(Interface):
-    """Settings registered with the portal_registry tool
-    """
+    """Settings registered with the portal_registry tool"""
 
-    default_grid_system = schema.ASCIILine(
-        title=_(u'Default grid system'),
-        description=_(u'Grid system to use when one is not specified '
-                      u'the result DOM.'),
-        default='deco')
+    esi = schema.Bool(
+        title=_(u"Enable Edge Side Includes"),
+        description=_(
+            u"Allows tiles which support Edge Side Includes (ESI) to be "
+            u"rendered as ESI links instead of invoked directly."
+        ),
+        default=False,
+    )
 
 
 class ILayoutField(Interface):
-    """Marker interface for the layout field
-    """
+    """Marker interface for the layout field"""
 
 
 class IOmittedField(Interface):
     """Marker interface to distinguish the layout behavior schema fields from
     other fields to allow hiding them in the user interfaces
+
+    DEPRECATED: Usage of this interface has no effect.
+    instead plone.autoform.directives.omitted is used now.
     """
+
+
+# class ILayoutFieldDefaultValue(Interface):
+#     """Multi adapter interface for looking up the default value for the
+#     layout field content
+#     """
+
+#     def __unicode__():
+#         """Return the layout as a unicode value"""
+
+#     def __str__():
+#         """Return the layout as a str value"""
+
+
+class IBaseTileRenderEvent(Interface):
+    """Base class for tile render events."""
+
+    tile_href = Attribute("URL of the rendered tile")
+    tile_node = Attribute("LXML.html node on which the tile is called")
+
+
+class IBeforeTileRenderEvent(IBaseTileRenderEvent):
+    """Thrown before a tile is rendered."""
+
+
+class IAfterTileRenderEvent(IBaseTileRenderEvent):
+    """Thrown after a tile is rendered."""

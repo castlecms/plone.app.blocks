@@ -1,111 +1,166 @@
 # -*- coding: utf-8 -*-
-import logging
-
 from AccessControl import getSecurityManager
-# Plone5.2 - 'Globals' no longer exists in Zope4
-# import Globals
+from App.config import getConfiguration
+from copy import deepcopy
+from diazo import compiler
+from diazo import cssrules
+from diazo import rules
+from diazo import utils
+from hashlib import md5
 from lxml import etree
 from lxml import html
+from plone.memoize import ram
+from plone.memoize.volatile import DontCache
+from plone.resource.utils import queryResourceDirectory
+from plone.subrequest import subrequest
+from six.moves.urllib import parse
+from z3c.form.interfaces import IFieldWidget
+from zExceptions import NotFound
+from zExceptions import Unauthorized
+from zope.component import getMultiAdapter
+from zope.component import queryUtility
+from zope.component.hooks import getSite
+from zope.security.interfaces import IPermission
+
+# Legacy imports
 from plone.app.blocks.interfaces import DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY
 from plone.app.blocks.layoutbehavior import ILayoutAware
 from plone.app.blocks.layoutbehavior import applyTilePersistent
-from plone.memoize.volatile import DontCache
-from plone.registry.interfaces import IRegistry
-from plone.resource.utils import queryResourceDirectory
-from plone.subrequest import subrequest
-from z3c.form.interfaces import IFieldWidget
-from zExceptions import NotFound
-from zope.component import getMultiAdapter
 from zope.component import getUtility
-from zope.component import queryUtility
-from zope.security.interfaces import IPermission
-from zope.site.hooks import getSite
+from plone.registry.interfaces import IRegistry
+
+import logging
+import six
+import zope.deferredimport
+
+
+zope.deferredimport.deprecated(
+    "Moved in own behavior due to avoid circular imports. "
+    "Import from plone.app.blocks.layoutbehavior instead",
+    getDefaultAjaxLayout="plone.app.blocks.layoutbehavior:" "getDefaultAjaxLayout",
+    getDefaultSiteLayout="plone.app.blocks.layoutbehavior:" "getDefaultSiteLayout",
+    getLayout="plone.app.blocks.layoutbehavior:getLayout",
+    getLayoutAwareSiteLayout="plone.app.blocks.layoutbehavior:"
+    "getLayoutAwareSiteLayout",
+)
 
 
 headXPath = etree.XPath("/html/head")
-layoutAttrib = 'data-layout'
+layoutAttrib = "data-layout"
 layoutXPath = etree.XPath("/html/@" + layoutAttrib)
-gridAttrib = 'data-gridsystem'
-gridXPath = etree.XPath("/html/@" + gridAttrib)
-tileAttrib = 'data-tile'
+tileAttrib = "data-tile"
 tileXPath = etree.XPath("/html//*[@" + tileAttrib + "]")
 headTileXPath = etree.XPath("/html/head//*[@" + tileAttrib + "]")
 bodyTileXPath = etree.XPath("/html/body//*[@" + tileAttrib + "]")
-gridDataAttrib = 'data-grid'
-gridDataXPath = etree.XPath("//*[@" + gridDataAttrib + "]")
 panelXPath = etree.XPath("//*[@data-panel]")
+gridDataAttrib = "data-grid"
+gridDataXPath = etree.XPath("//*[@" + gridDataAttrib + "]")
+logger = logging.getLogger("plone.app.blocks")
 
 
-logger = logging.getLogger('plone.app.blocks')
-
-
-def extractCharset(response, default='utf-8'):
-    """Get the charset of the given response
-    """
+def extractCharset(response, default="utf-8"):
+    """Get the charset of the given response"""
 
     charset = default
-    if 'content-type' in response.headers:
-        for item in response.headers['content-type'].split(';'):
-            if item.strip().startswith('charset'):
-                charset = item.split('=')[1].strip()
+    if "content-type" in response.headers:
+        for item in response.headers["content-type"].split(";"):
+            if item.strip().startswith("charset"):
+                charset = item.split("=")[1].strip()
                 break
     return charset
 
 
 def resolve(url, resolved=None):
-    """Resolve the given URL to an lxml tree.
-    """
-
+    """Resolve the given URL to an lxml tree."""
     if resolved is None:
-        resolved = resolveResource(url)
+        try:
+            resolved = resolveResource(url)
+        except Exception:
+            logger.exception(
+                "There was an error while resolving the tile: {0}".format(
+                    url,
+                ),
+            )
+            scheme, netloc, path, params, query, fragment = parse.urlparse(url)
+            tile_parts = {
+                "scheme": scheme,
+                "netloc": netloc,
+                "path": path,
+            }
+            resolved = """<html>
+<body>
+    <dl class="portalMessage error" role="alert">
+        <dt>Error</dt>
+        <dd>There was an error while resolving the tile {scheme}://{netloc}{path}</dd>
+    </dl>
+</body>
+</html>
+""".format(
+                **tile_parts
+            )
+
     if not resolved.strip():
-        return None
+        return
+
+    if isinstance(resolved, str):
+        resolved = resolved.encode("utf-8")
+
     try:
-        if isinstance(resolved, unicode):
-            html_parser = html.HTMLParser(encoding='utf-8')
-            return html.fromstring(resolved.encode('utf-8'),
-                                   parser=html_parser).getroottree()
-        else:
-            return html.fromstring(resolved).getroottree()
+        html_parser = html.HTMLParser(encoding="utf-8")
+        return html.fromstring(resolved, parser=html_parser).getroottree()
     except etree.XMLSyntaxError as e:
-        logger.error('%s: %s' % (repr(e), url))
-        return None
+        logger.error("%s: %s" % (repr(e), url))
+        return
+
+
+def subresponse_exception_handler(response, exception):
+    if isinstance(exception, Unauthorized):
+        response.setStatus = 401
+        return
+    return response.exception()
 
 
 def resolveResource(url):
     """Resolve the given URL to a unicode string. If the URL is an absolute
     path, it will be made relative to the Plone site root.
     """
-    if url.count('++') == 2:
+    url = parse.unquote(url)  # subrequest does not support quoted paths
+    scheme, netloc, path, params, query, fragment = parse.urlparse(url)
+    if path.count("++") == 2:
         # it is a resource that can be resolved without a subrequest
-        _, resource_type, path = url.split('++')
-        resource_name, _, path = path.partition('/')
+        _, resource_type, path = path.split("++")
+        resource_name, _, path = path.partition("/")
         directory = queryResourceDirectory(resource_type, resource_name)
         if directory:
             try:
-                return directory.readFile(str(path))
-            except NotFound:
+                res = directory.readFile(path)
+                if isinstance(res, six.binary_type):
+                    res = res.decode()
+                return res
+            except (NotFound, IOError):
                 pass
 
-    if url.startswith('/'):
+    if url.startswith("/"):
         site = getSite()
-        url = '/'.join(site.getPhysicalPath()) + url
+        url = "/".join(site.getPhysicalPath()) + url
 
-    response = subrequest(url)
+    response = subrequest(url, exception_handler=subresponse_exception_handler)
     if response.status == 404:
         raise NotFound(url)
+    elif response.status == 401:
+        raise Unauthorized(url)
 
     resolved = response.getBody()
 
-    if isinstance(resolved, str):
+    if isinstance(resolved, six.binary_type):
         charset = extractCharset(response)
         resolved = resolved.decode(charset)
 
     if response.status in (301, 302):
         site = getSite()
-        location = response.headers.get('location') or ''
+        location = response.headers.get("location") or ""
         if location.startswith(site.absolute_url()):
-            return resolveResource(location[len(site.absolute_url()):])
+            return resolveResource(location[len(site.absolute_url()) :])
 
     elif response.status != 200:
         raise RuntimeError(resolved)
@@ -114,35 +169,30 @@ def resolveResource(url):
 
 
 def xpath1(xpath, node, strict=True):
-    """Return a single node matched by the given etree.XPath object.
-    """
+    """Return a single node matched by the given etree.XPath object."""
 
-    if isinstance(xpath, basestring):
+    if isinstance(xpath, six.string_types):
         xpath = etree.XPath(xpath)
 
     result = xpath(node)
     if len(result) == 1:
         return result[0]
-    else:
-        if (len(result) > 1 and strict) or len(result) == 0:
-            return None
-        else:
-            return result
+    elif not ((len(result) > 1 and strict) or len(result) == 0):
+        return result
 
 
 def append_text(element, text):
     if text:
-        element.text = (element.text or '') + text
+        element.text = (element.text or "") + text
 
 
 def append_tail(element, text):
     if text:
-        element.tail = (element.tail or '') + text
+        element.tail = (element.tail or "") + text
 
 
 def replace_with_children(element, wrapper):
-    """element.replace also replaces the tail and forgets the wrapper.text
-    """
+    """element.replace also replaces the tail and forgets the wrapper.text"""
     # XXX needs tests
     parent = element.getparent()
     index = parent.index(element)
@@ -172,16 +222,19 @@ def replace_with_children(element, wrapper):
 
 
 def replace_content(element, wrapper):
-    """Similar to above but keeps parent tag
-    """
+    """Similar to above but keeps parent tag"""
     del element[:]
     if wrapper is not None:
         element.text = wrapper.text
         element.extend(wrapper.getchildren())
 
 
-class PermissionChecker(object):
+def remove_element(element):
+    parent = element.getparent()
+    parent.remove(element)
 
+
+class PermissionChecker(object):
     def __init__(self, permissions, context):
         self.permissions = permissions
         self.context = context
@@ -197,8 +250,7 @@ class PermissionChecker(object):
                     self.cache[permission_name] = True
                 else:
                     self.cache[permission_name] = bool(
-                        self.sm.checkPermission(permission.title,
-                                                self.context),
+                        self.sm.checkPermission(permission.title, self.context)
                     )
         return self.cache.get(permission_name, True)
 
@@ -208,11 +260,11 @@ def _getWidgetName(field, widgets, request):
         factory = widgets[field.__name__]
     else:
         factory = getMultiAdapter((field, request), IFieldWidget)
-    if isinstance(factory, basestring):
+    if isinstance(factory, six.string_types):
         return factory
     if not isinstance(factory, type):
         factory = factory.__class__
-    return '%s.%s' % (factory.__module__, factory.__name__)
+    return "%s.%s" % (factory.__module__, factory.__name__)
 
 
 def isVisible(name, omitted):
@@ -224,10 +276,12 @@ def isVisible(name, omitted):
 
 
 def cacheKey(func, rules_url, theme_node):
-    # Plone5.2 - 'Globals' no longer exists. Remove for now?
-    # if Globals.DevelopmentMode:
-    #     raise DontCache()
-    return ':'.join([rules_url, html.tostring(theme_node)])
+    if getConfiguration().debug_mode:
+        raise DontCache()
+    key = md5()
+    key.update(rules_url)
+    key.update(html.tostring(theme_node))
+    return key.hexdigest()
 
 
 def getLayout(content):
