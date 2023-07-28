@@ -5,6 +5,8 @@ from plone.app.blocks import panel
 from plone.app.blocks import tiles
 from plone.tiles import esi
 from plone.tiles.interfaces import ESI_HEADER
+# Plone5.2 TODO - Remove 'gridsystem' references
+from plone.app.blocks import gridsystem
 from plone.transformchain.interfaces import ITransform
 from repoze.xmliter.serializer import XMLSerializer
 from repoze.xmliter.utils import getHTMLSerializer
@@ -167,4 +169,29 @@ class IncludeTiles(object):
         result.tree = tiles.renderTiles(self.request, result.tree)
         return result
 
+# Plone5.2 TODO - Remove 'gridsystem' references
+@implementer(ITransform)
+class ApplyResponsiveClass(object):
+    """Turn a panel-merged page into the final composition by including tiles.
+    Assumes the input result is an lxml tree and returns an lxml tree for
+    later serialization.
+    """
 
+    order = 8900
+
+    def __init__(self, published, request):
+        self.published = published
+        self.request = request
+
+    def transformString(self, result, encoding):
+        return None
+
+    def transformUnicode(self, result, encoding):
+        return None
+
+    def transformIterable(self, result, encoding):
+        if not self.request.get('plone.app.blocks.enabled', False) or \
+                not isinstance(result, XMLSerializer):
+            return None
+        result.tree = gridsystem.merge(self.request, result.tree)
+        return result

@@ -42,15 +42,21 @@ class IBlocksTransformEnabled(Interface):
 
 class IBlocksSettings(Interface):
     """Settings registered with the portal_registry tool"""
+    # Plone5.2 TODO - Change 'gridsystem' back to 'esi'
+    default_grid_system = schema.ASCIILine(
+        title=_(u'Default grid system'),
+        description=_(u'Grid system to use when one is not specified '
+                      u'the result DOM.'),
+        default='deco')
 
-    esi = schema.Bool(
-        title=_(u"Enable Edge Side Includes"),
-        description=_(
-            u"Allows tiles which support Edge Side Includes (ESI) to be "
-            u"rendered as ESI links instead of invoked directly."
-        ),
-        default=False,
-    )
+    # esi = schema.Bool(
+    #     title=_(u"Enable Edge Side Includes"),
+    #     description=_(
+    #         u"Allows tiles which support Edge Side Includes (ESI) to be "
+    #         u"rendered as ESI links instead of invoked directly."
+    #     ),
+    #     default=False,
+    # )
 
 
 class ILayoutField(Interface):

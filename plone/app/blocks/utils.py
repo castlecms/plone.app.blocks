@@ -22,12 +22,6 @@ from zope.component import queryUtility
 from zope.component.hooks import getSite
 from zope.security.interfaces import IPermission
 
-# Legacy imports
-from plone.app.blocks.interfaces import DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY
-from plone.app.blocks.layoutbehavior import ILayoutAware
-from zope.component import getUtility
-from plone.registry.interfaces import IRegistry
-
 import logging
 import six
 import zope.deferredimport
@@ -47,6 +41,9 @@ zope.deferredimport.deprecated(
 headXPath = etree.XPath("/html/head")
 layoutAttrib = "data-layout"
 layoutXPath = etree.XPath("/html/@" + layoutAttrib)
+# Plone5.2 TODO - Remove 'gridsystem' references
+gridAttrib = 'data-gridsystem'
+gridXPath = etree.XPath("/html/@" + gridAttrib)
 tileAttrib = "data-tile"
 tileXPath = etree.XPath("/html//*[@" + tileAttrib + "]")
 headTileXPath = etree.XPath("/html/head//*[@" + tileAttrib + "]")
@@ -300,32 +297,3 @@ def applyTilePersistent(path, resolved):
                 url += "?X-Tile-Persistent=yes"
         node.attrib[tileAttrib] = url
     return html.tostring(tree, encoding="unicode")
-
-
-def getLayout(content):
-    behavior_data = ILayoutAware(content)
-    if behavior_data.contentLayout:
-        try:
-            path = behavior_data.contentLayout
-            resolved = resolveResource(path)
-            layout = applyTilePersistent(path, resolved)
-        except (NotFound, RuntimeError):
-            layout = ''
-    else:
-        layout = behavior_data.content
-
-    if not layout:
-        registry = getUtility(IRegistry)
-        try:
-            path = registry['%s.%s' % (
-                DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY,
-                content.portal_type.replace(' ', '-'))]
-        except (KeyError, AttributeError):
-            path = None
-        try:
-            path = path or registry[DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY]
-            resolved = resolveResource(path)
-            layout = applyTilePersistent(path, resolved)
-        except (KeyError, NotFound, RuntimeError):
-            pass
-    return layout
