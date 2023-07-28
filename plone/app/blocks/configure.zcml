@@ -105,26 +105,6 @@
         factory=".resource.ContentLayoutTraverser"
         />
 
-    <!-- BS3 Grid System -->
-    <utility
-        provides=".gridsystem.IGridSystem"
-        component=".gridsystem.BS3GridSystem"
-        name="bs3"
-        />
-
-    <!-- Foundation Grid System -->
-    <utility
-        provides=".gridsystem.IGridSystem"
-        component=".gridsystem.FoundationGridSystem"
-        name="foundation"
-        />
-
-    <!-- Deco Grid System -->
-    <utility
-        provides=".gridsystem.IGridSystem"
-        component=".gridsystem.DecoGridSystem"
-        name="deco"
-        />
 
     <!-- patches -->
     <include package="collective.monkeypatcher" />
