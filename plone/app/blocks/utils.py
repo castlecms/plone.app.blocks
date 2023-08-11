@@ -41,7 +41,7 @@ zope.deferredimport.deprecated(
 headXPath = etree.XPath("/html/head")
 layoutAttrib = "data-layout"
 layoutXPath = etree.XPath("/html/@" + layoutAttrib)
-# Plone5.2 TODO - Remove 'gridsystem' references
+# Plone5.2 TODO - Re-evaluate gridsystem
 gridAttrib = 'data-gridsystem'
 gridXPath = etree.XPath("/html/@" + gridAttrib)
 tileAttrib = "data-tile"

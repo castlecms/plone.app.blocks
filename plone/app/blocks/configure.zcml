@@ -105,6 +105,7 @@
         factory=".resource.ContentLayoutTraverser"
         />
 
+    <!-- Plone5.2 TODO - Re-evaluate gridsystem -->
     <!-- BS3 Grid System -->
     <utility
         provides=".gridsystem.IGridSystem"

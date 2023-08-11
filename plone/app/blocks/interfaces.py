@@ -42,7 +42,7 @@ class IBlocksTransformEnabled(Interface):
 
 class IBlocksSettings(Interface):
     """Settings registered with the portal_registry tool"""
-    # Plone5.2 TODO - Change 'gridsystem' back to 'esi'
+    # Plone5.2 TODO - Re-evaluate gridsystem
     default_grid_system = schema.ASCIILine(
         title=_(u'Default grid system'),
         description=_(u'Grid system to use when one is not specified '

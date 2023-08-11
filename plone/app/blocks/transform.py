@@ -169,7 +169,7 @@ class IncludeTiles(object):
         result.tree = tiles.renderTiles(self.request, result.tree)
         return result
 
-# Plone5.2 TODO - Remove 'gridsystem' references
+# Plone5.2 TODO - Re-evaluate gridsystem
 @implementer(ITransform)
 class ApplyResponsiveClass(object):
     """Turn a panel-merged page into the final composition by including tiles.
@@ -195,3 +195,36 @@ class ApplyResponsiveClass(object):
             return None
         result.tree = gridsystem.merge(self.request, result.tree)
         return result
+    
+@implementer(ITransform)
+class ESIRender(object):
+    """If ESI rendering was used, render the page down to a format that allows
+    ESI to work.
+    """
+
+    order = 9900
+
+    def __init__(self, published, request):
+        self.published = published
+        self.request = request
+
+    def transformBytes(self, result, encoding):
+        if self.request.getHeader(ESI_HEADER, "false").lower() != "true":
+            return
+
+        return esi.substituteESILinks([result])
+
+    def transformUnicode(self, result, encoding):
+        if self.request.getHeader(ESI_HEADER, "false").lower() != "true":
+            return
+
+        return esi.substituteESILinks([result.encode(encoding, "ignore")])
+
+    def transformIterable(self, result, encoding):
+        if self.request.getHeader(ESI_HEADER, "false").lower() != "true":
+            return
+        result = "".join(str(result))
+        transformed = esi.substituteESILinks(result)
+        if transformed != result:
+            self.request.response.setHeader("X-Esi", "1")
+        return transformed

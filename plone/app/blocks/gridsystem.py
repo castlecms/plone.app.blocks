@@ -1,5 +1,15 @@
 # -*- coding: utf-8 -*-
-# Plone5.2 TODO - Eventually delete this file as 'grisystem' was removed shortly after this fork
+"""
+Plone5.2 TODO 
+
+    We may need to eventually move away from the 'gridsystem' as it was removed from blocks 
+    shortly after the fork. Intital attempts to remove it broke things badly in the layout editor.
+    
+    The only solution mentioned is 'using grid framework agnostic CSS class names and building 
+    CSS grid against those class names.'
+
+"""
+
 import json
 import logging
 
