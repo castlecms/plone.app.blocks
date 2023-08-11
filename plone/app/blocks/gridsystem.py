@@ -142,6 +142,14 @@ def merge(request, layoutTree):
     gridUtil = gridUtil()
     for layoutGridNode in utils.gridDataXPath(layoutTree):
         gridinfo = layoutGridNode.attrib['data-grid']
+
+        # Plone5.2 TODO - For some reason, the first node in the tree has the value of 'bs3'
+        #                 for 'data-grid' as opposed to the JSON needed to construct the bootstrap classes.
+        #                 This caused the remaining nodes in the tree to not be converted properly.
+        #                 Need to figure out how that extra node is getting there and remove this escape
+        if gridinfo == 'bs3':
+            continue
+
         try:
             cssGridClass = gridUtil.transform(gridinfo)
         except (ValueError, KeyError):
