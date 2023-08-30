@@ -10,6 +10,8 @@ from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from zope.component import getAdapters
 from zope.interface import alsoProvides
 from zope.interface import implementer
+from castle.cms.theming import renderWithTheme
+from plone.app.theming.utils import theming_policy
 
 import os
 
@@ -61,7 +63,15 @@ class ContentLayoutView(DefaultView):
         if not self.request.response.getHeader('Content-Type'):
             # Needed since Plone 5.2.10.1/6.0.0.1 with Zope security fix.
             self.request.response.setHeader('Content-Type', 'text/html')
-        return result
+
+        policy = theming_policy(self.request)
+        settings = policy.getSettings()
+        try:
+            if not settings or settings.rules:
+                return self.index()
+        except AttributeError:
+            pass
+        return renderWithTheme(self.context, self.request, result)
 
 
 @implementer(IBlocksTransformEnabled)

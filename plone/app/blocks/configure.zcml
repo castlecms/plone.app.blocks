@@ -80,7 +80,7 @@
     <browser:page
         for="*"
         name="layout_view"
-        class=".browser.ContentLayoutView"
+        class=".layoutviews.ContentLayoutView"
         permission="zope2.View"
         template="templates/layout_view.pt"
         />
@@ -187,12 +187,13 @@
     <adapter factory=".linkintegrity.TileGeneral" />
 
     <!-- plone.tiles overrides here! -->
-    <include package="z3c.unconfigure" file="meta.zcml" />
-    <unconfigure>
-        <adapter factory="plone.tiles.data.transientTileDataManagerFactory" />
-        <adapter factory="plone.tiles.data.PersistentTileDataManager" />
-    </unconfigure>
-    <adapter factory=".tiles.transientTileDataManagerFactory" />
-    <adapter factory=".tiles.PersistentTileDataManager" />
+    <!-- Plone5.2 - Removing unconfigure records for now -->
+    <!-- <include package="z3c.unconfigure" file="meta.zcml" /> -->
+    <!-- <unconfigure> -->
+    <!-- <adapter factory="plone.tiles.data.transientTileDataManagerFactory" /> -->
+    <!-- <adapter factory="plone.tiles.data.PersistentTileDataManager" /> -->
+    <!-- </unconfigure> -->
+    <!-- <adapter factory=".tiles.transientTileDataManagerFactory" /> -->
+    <!-- <adapter factory=".tiles.PersistentTileDataManager" /> -->
 
 </configure>

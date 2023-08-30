@@ -45,6 +45,7 @@ layoutXPath = etree.XPath("/html/@" + layoutAttrib)
 gridAttrib = 'data-gridsystem'
 gridXPath = etree.XPath("/html/@" + gridAttrib)
 tileAttrib = "data-tile"
+tileRulesAttrib = "data-rules"
 tileXPath = etree.XPath("/html//*[@" + tileAttrib + "]")
 headTileXPath = etree.XPath("/html/head//*[@" + tileAttrib + "]")
 bodyTileXPath = etree.XPath("/html/body//*[@" + tileAttrib + "]")
@@ -278,6 +279,133 @@ def cacheKey(func, rules_url, theme_node):
     key.update(rules_url)
     key.update(html.tostring(theme_node))
     return key.hexdigest()
+
+def add_theme(rules_doc, theme_doc, absolute_prefix=None):
+    if absolute_prefix is None:
+        absolute_prefix = ""
+    root = rules_doc.getroot()
+    element = root.makeelement(rules.fullname(rules.namespaces["diazo"], "theme"))
+    root.append(element)
+    rules.expand_theme(element, theme_doc, absolute_prefix)
+    return rules_doc
+
+def process_rules(
+    rules_doc,
+    theme=None,
+    trace=None,
+    css=True,
+    absolute_prefix=None,
+    includemode=None,
+    update=True,
+    stop=None,
+):
+    if trace:
+        trace = "1"
+    else:
+        trace = "0"
+    if stop == 0:
+        return rules_doc
+    if stop == 1:
+        return rules_doc
+    rules_doc = rules.add_identifiers(rules_doc)
+    if stop == 2 or stop == "add_identifiers":
+        return rules_doc
+    if update:
+        rules_doc = rules.update_namespace(rules_doc)
+    if stop == 3:
+        return rules_doc
+    if css:
+        rules_doc = cssrules.convert_css_selectors(rules_doc)
+    if stop == 4:
+        return rules_doc
+    rules_doc = rules.fixup_theme_comment_selectors(rules_doc)
+    if stop == 5:
+        return rules_doc
+    if theme is not None:
+        rules_doc = add_theme(rules_doc, theme, absolute_prefix)
+    if stop == 6:
+        return rules_doc
+    if includemode is None:
+        includemode = "document"
+    includemode = "'%s'" % includemode
+    rules_doc = rules.normalize_rules(rules_doc, includemode=includemode)
+    if stop == 7:
+        return rules_doc
+    rules_doc = rules.apply_conditions(rules_doc)
+    if stop == 8:
+        return rules_doc
+    rules_doc = rules.merge_conditions(rules_doc)
+    if stop == 9:
+        return rules_doc
+    rules_doc = rules.fixup_themes(rules_doc)
+    if stop == 10:
+        return rules_doc
+    rules_doc = rules.annotate_themes(rules_doc)
+    if stop == 11:
+        return rules_doc
+    rules_doc = rules.include(rules_doc)
+    if stop == 12:
+        return rules_doc
+    rules_doc = rules.annotate_rules(rules_doc)
+    if stop == 13:
+        return rules_doc
+    rules_doc = rules.apply_rules(rules_doc, trace=trace)
+    return rules_doc
+
+
+def compile_theme(
+    rules_doc,
+    theme_doc=None,
+    css=True,
+    absolute_prefix=None,
+    update=True,
+    trace=False,
+    includemode=None,
+    parser=None,
+    compiler_parser=None,
+):
+
+    rules_doc = process_rules(
+        rules_doc=rules_doc,
+        theme=theme_doc,
+        css=css,
+        absolute_prefix=absolute_prefix,
+        update=update,
+        trace=trace,
+        includemode=includemode,
+    )
+
+    # Build a document with all the <xsl:param /> values to set the defaults
+    # for every value passed in as xsl_params
+    known_params = compiler.build_xsl_params_document({})
+
+    # Create a pseudo resolver for this
+    known_params_url = "file:///__diazo_known_params__"
+    emit_stylesheet_resolver = utils.CustomResolver(
+        {known_params_url: etree.tostring(known_params)}
+    )
+    emit_stylesheet_parser = etree.XMLParser()
+    emit_stylesheet_parser.resolvers.add(emit_stylesheet_resolver)
+
+    # Run the final stage compiler
+    emit_stylesheet = utils.pkg_xsl(
+        "emit-stylesheet.xsl", parser=emit_stylesheet_parser
+    )
+    compiled_doc = emit_stylesheet(rules_doc)
+    compiled_doc = compiler.set_parser(
+        etree.tostring(compiled_doc), parser, compiler_parser
+    )
+
+    return compiled_doc
+
+
+@ram.cache(cacheKey)
+def resolve_transform(rules_url, theme_node):
+    rules_doc = resolveResource(rules_url)  # may raise NotFound
+    rules_doc = etree.ElementTree(etree.fromstring(rules_doc))
+    compiled = compile_theme(rules_doc, etree.ElementTree(deepcopy(theme_node)))
+    transform = etree.XSLT(compiled)
+    return transform
 
 
 @ram.cache(lambda fun, path, resolved: md5(resolved).hexdigest())

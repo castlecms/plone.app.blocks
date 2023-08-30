@@ -2,21 +2,40 @@
 from plone.resource.manifest import ManifestFormat
 from zope import schema
 from zope.i18nmessageid import MessageFactory
+from zope.interface import Attribute
 from zope.interface import Interface
 
 
-CONTENT_LAYOUT_RESOURCE_NAME = 'contentlayout'
-CONTENT_LAYOUT_FILE_NAME = "content.html"
-DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY = 'plone.app.blocks.default_layout'
-DEFAULT_AJAX_LAYOUT_REGISTRY_KEY = "plone.defaultAjaxLayout"
-DEFAULT_SITE_LAYOUT_REGISTRY_KEY = "plone.defaultSiteLayout"
+SITE_LAYOUT_RESOURCE_NAME = "sitelayout"
+CONTENT_LAYOUT_RESOURCE_NAME = "contentlayout"
 
+SITE_LAYOUT_FILE_NAME = "site.html"
+CONTENT_LAYOUT_FILE_NAME = "content.html"
+
+SITE_LAYOUT_MANIFEST_FORMAT = ManifestFormat(
+    SITE_LAYOUT_RESOURCE_NAME,
+    keys=("title", "description", "file"),
+    defaults={"file": SITE_LAYOUT_FILE_NAME},
+)
 CONTENT_LAYOUT_MANIFEST_FORMAT = ManifestFormat(
     CONTENT_LAYOUT_RESOURCE_NAME,
-    keys=('title', 'description', 'file', 'preview', 'for', 'sort_key',
-          'layer'),
-    defaults={'file': CONTENT_LAYOUT_FILE_NAME}
+    keys=(
+        "title",
+        "description",
+        "file",
+        "screenshot",
+        "preview",
+        "sort_key",
+        "for",
+        "permission",
+    ),
+    defaults={"file": CONTENT_LAYOUT_FILE_NAME},
 )
+
+DEFAULT_SITE_LAYOUT_REGISTRY_KEY = "plone.defaultSiteLayout"
+DEFAULT_AJAX_LAYOUT_REGISTRY_KEY = "plone.defaultAjaxLayout"
+
+DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY = "plone.app.blocks.default_layout"
 
 # XXX
 # unused, b/w compat defs
@@ -49,14 +68,14 @@ class IBlocksSettings(Interface):
                       u'the result DOM.'),
         default='deco')
 
-    # esi = schema.Bool(
-    #     title=_(u"Enable Edge Side Includes"),
-    #     description=_(
-    #         u"Allows tiles which support Edge Side Includes (ESI) to be "
-    #         u"rendered as ESI links instead of invoked directly."
-    #     ),
-    #     default=False,
-    # )
+    esi = schema.Bool(
+        title=_(u"Enable Edge Side Includes"),
+        description=_(
+            u"Allows tiles which support Edge Side Includes (ESI) to be "
+            u"rendered as ESI links instead of invoked directly."
+        ),
+        default=False,
+    )
 
 
 class ILayoutField(Interface):
@@ -84,16 +103,16 @@ class IOmittedField(Interface):
 #         """Return the layout as a str value"""
 
 
-# class IBaseTileRenderEvent(Interface):
-#     """Base class for tile render events."""
+class IBaseTileRenderEvent(Interface):
+    """Base class for tile render events."""
 
-#     tile_href = Attribute("URL of the rendered tile")
-#     tile_node = Attribute("LXML.html node on which the tile is called")
-
-
-# class IBeforeTileRenderEvent(IBaseTileRenderEvent):
-#     """Thrown before a tile is rendered."""
+    tile_href = Attribute("URL of the rendered tile")
+    tile_node = Attribute("LXML.html node on which the tile is called")
 
 
-# class IAfterTileRenderEvent(IBaseTileRenderEvent):
-#     """Thrown after a tile is rendered."""
+class IBeforeTileRenderEvent(IBaseTileRenderEvent):
+    """Thrown before a tile is rendered."""
+
+
+class IAfterTileRenderEvent(IBaseTileRenderEvent):
+    """Thrown after a tile is rendered."""
