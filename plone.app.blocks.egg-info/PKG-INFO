@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: plone.app.blocks
-Version: 5.2.1
+Version: 10.0.27
 Summary: Implements the in-Plone blocks rendering process
 Home-page: https://github.com/plone/plone.app.blocks
 Author: Martin Aspeli, Laurence Rowe
@@ -31,6 +31,25 @@ License-File: LICENSE.txt
 Introduction to Blocks
 ======================
 
+This is a fork of the standard plone.app.blocks package for Castle CMS. The main
+difference in this package is the way tiles are rendered on a page to improve
+eliability and speed.
+
+This fork also removes things that are unnecessary transforms:
+
+- plone.app.blocks.mergepanels
+- plone.app.blocks.esirender
+
+
+This package is released to a private repository.
+
+The rest of the docs are exactly the same as the original...
+
+
+.. image:: https://secure.travis-ci.org/plone/plone.app.blocks.png?branch=master
+    :alt: Travis CI badge
+    :target: http://travis-ci.org/plone/plone.app.blocks
+
 .. image:: https://coveralls.io/repos/plone/plone.app.blocks/badge.png?branch=master
     :alt: Coveralls badge
     :target: https://coveralls.io/r/plone/plone.app.blocks
@@ -45,18 +64,18 @@ The rendering stages are:
     This is then used by the subsequent stages.
     If the input is not HTML, the transformation is aborted.
 
-``plone.app.blocks.mergepanels`` (order 8100)
-    Looks up the site layout and executes the panel merge algorithm.
-    Sets a request variable ('plone.app.blocks.merged') to indicate that it has done its job.
+.. ``plone.app.blocks.mergepanels`` (order 8100)
+..     Looks up the site layout and executes the panel merge algorithm.
+..     Sets a request variable ('plone.app.blocks.merged') to indicate that it has done its job.
 
 ``plone.app.blocks.tiles`` (order 8500)
     Resolve tiles and place them directly into the merged layout.
     This is the fallback for views that do not opt into ``ITilePageRendered``.
 
-``plone.app.blocks.esirender`` (order 9900)
-    Only executed if the request key ``plone.app.blocks.esi`` is set and its value is true,
-    as would be the case if any ESI-rendered tiles are included and ESI rendering is enabled globally.
-    This step will serialise the response down to a string and perform some substitution to make ESI rendering work.
+.. ``plone.app.blocks.esirender`` (order 9900)
+..     Only executed if the request key ``plone.app.blocks.esi`` is set and its value is true,
+..     as would be the case if any ESI-rendered tiles are included and ESI rendering is enabled globally.
+..     This step will serialise the response down to a string and perform some substitution to make ESI rendering work.
 
 
 Site layouts
@@ -1297,14 +1316,12 @@ New:
   using multiple ``[...layout]`` directive in the same manifest
   [vangheem]
 
-
 2.1.2 (2015-06-10)
 ------------------
 
 - Fix issue where grid transform did replaced class names instead of appending
   to them
   [datakurre]
-
 
 2.1.1 (2015-06-10)
 ------------------
@@ -1317,7 +1334,6 @@ New:
   transform (add to log syntax errors instead)
   [datakurre]
 
-
 2.1.0 (2015-05-25)
 ------------------
 
@@ -1326,7 +1342,6 @@ New:
   indexer behavior is enabled for the indexed content type with Layout support
   behavior
   [datakurre]
-
 
 2.0.0 (2015-04-21)
 ------------------
@@ -1447,7 +1462,6 @@ New:
 - Add z3c.autoinclude support
   [cdw9, calvinhp]
 
-
 1.1 (2012-12-17)
 ----------------
 
@@ -1457,7 +1471,6 @@ New:
 - handle not found errors while rendering tiles so layout
   isn't borked
   [vangheem]
-
 
 1.0 (2012-06-23)
 ----------------
