@@ -321,7 +321,7 @@ def invalidate_view_memoize(view, name, args, kwargs):
         view.__class__.__name__,
         name,
         args[1:],
-        frozenset(kwargs.items()),
+        frozenset(list(kwargs.items())),
     )
 
     return cache.pop(key, None)
@@ -517,7 +517,7 @@ class LayoutAwareTileDataStorage(object):
         return items
 
     def __len__(self):
-        return len(self.items())
+        return len(list(self.items()))
 
 
 @deprecate("adapt with ILayoutAware instead, call adapter.site_layout()")

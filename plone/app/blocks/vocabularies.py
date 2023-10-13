@@ -2,18 +2,17 @@ from plone.app.theming.interfaces import THEME_RESOURCE_NAME
 from plone.app.theming.utils import getCurrentTheme
 from plone.resource.utils import queryResourceDirectory
 from zope.globalrequest import getRequest
-from zope.interface import implements
+from zope.interface import implementer
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleVocabulary
 
 
 CACHE_REQ_KEY = 'plone.sitelayouts'
 
+@implementer(IVocabularyFactory)
 class AvailableSiteLayoutsFactory(object):
     """Vocabulary to return available layouts of a given type
     """
-
-    implements(IVocabularyFactory)
 
     def __call__(self, context):
         req = getRequest()

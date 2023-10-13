@@ -18,7 +18,7 @@ from plone.app.blocks.interfaces import IBlocksSettings
 from plone.registry.interfaces import IRegistry
 from zope.component import queryUtility
 from zope.interface import Interface
-from zope.interface import implements
+from zope.interface import implementer
 
 
 logger = logging.getLogger('plone.app.blocks')
@@ -29,8 +29,8 @@ class IGridSystem(Interface):
     """
 
 
+@implementer(IGridSystem)
 class BS3GridSystem(object):
-    implements(IGridSystem)
 
     def __init__(self):
         self.offset = 1
@@ -65,8 +65,8 @@ class BS3GridSystem(object):
             return result
 
 
+@implementer(IGridSystem)
 class FoundationGridSystem(object):
-    implements(IGridSystem)
 
     def transform(self, key):
         """ its possible:
@@ -97,8 +97,8 @@ class FoundationGridSystem(object):
             return result
 
 
+@implementer(IGridSystem)
 class DecoGridSystem(object):
-    implements(IGridSystem)
 
     def transform(self, key):
         """ its possible:

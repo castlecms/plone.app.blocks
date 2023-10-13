@@ -60,7 +60,7 @@ class ParseXML(object):
     def transformIterable(self, result, encoding):
         try:
             # We do NOT want to transform File responses since these can be layouts
-            if isinstance(self.published.im_self, File):
+            if isinstance(self.published.__self__, File):
                 self.request['plone.app.blocks.disabled'] = True
                 return None
         except AttributeError:
