@@ -1,6 +1,13 @@
 Changelog
 =========
 
+5.2.1+castle1 (unreleased)
+--------------------------
+
+- drop 10.x versioning for castle.cms specific compatibility releases
+- update to plone.app.blocks version 5.2.1 from 3.x
+
+
 5.2.1 (2022-12-21)
 ------------------
 
