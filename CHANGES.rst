@@ -1,6 +1,12 @@
 Changelog
 =========
 
+5.2.1+castle2 (unreleased)
+--------------------------
+
+- Nothing changed yet.
+
+
 5.2.1+castle1 (2023-11-30)
 --------------------------
 
