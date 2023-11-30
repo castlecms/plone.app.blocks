@@ -1,7 +1,7 @@
 Changelog
 =========
 
-5.2.1+castle1 (unreleased)
+5.2.1+castle1 (2023-11-30)
 --------------------------
 
 - drop 10.x versioning for castle.cms specific compatibility releases
