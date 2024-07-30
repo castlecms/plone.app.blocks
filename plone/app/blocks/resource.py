@@ -2,7 +2,7 @@
 from ConfigParser import SafeConfigParser
 import logging
 
-import Globals
+from App.config import getConfiguration
 from Products.CMFCore.utils import getToolByName
 from plone.app.blocks.interfaces import CONTENT_LAYOUT_FILE_NAME
 from plone.app.blocks.interfaces import CONTENT_LAYOUT_MANIFEST_FORMAT
@@ -188,7 +188,7 @@ def cacheKey(method, self):
     or the content is modified
     """
 
-    if Globals.DevelopmentMode:
+    if getConfiguration().debug_mode:
         raise volatile.DontCache()
 
     catalog = getToolByName(self.context, 'portal_catalog')

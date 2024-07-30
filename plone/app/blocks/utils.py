@@ -2,7 +2,7 @@
 import logging
 
 from AccessControl import getSecurityManager
-import Globals
+from App.config import getConfiguration
 from lxml import etree
 from lxml import html
 from plone.app.blocks.interfaces import DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY
@@ -223,7 +223,7 @@ def isVisible(name, omitted):
 
 
 def cacheKey(func, rules_url, theme_node):
-    if Globals.DevelopmentMode:
+    if getConfiguration().debug_mode:
         raise DontCache()
     return ':'.join([rules_url, html.tostring(theme_node)])
 
