@@ -118,11 +118,11 @@ def merge(request, layoutTree):
     # Find layout node
     gridSystem = utils.xpath1(utils.gridXPath, layoutTree)
     if gridSystem is None:
-        gridSystem = 'deco'
+        gridSystem = 'bs3'
         registry = queryUtility(IRegistry)
         if registry:
             settings = registry.forInterface(IBlocksSettings, check=False)
-            gridSystem = settings.default_grid_system or 'deco'
+            gridSystem = settings.default_grid_system or 'bs3'
 
     gridUtil = queryUtility(IGridSystem, gridSystem)
     if gridUtil is None:

@@ -1,11 +1,18 @@
 Changelog
 =========
 
-3.0.1 (unreleased)
-------------------
+10.0.28 (2017-04-04)
+--------------------
 
-- Fix the default view to report template name as 'template-layout'
-  [datakurre]
+- default to bs3 grid system
+  [vangheem]
+
+10.0.27 (2016-12-20)
+--------------------
+
+- be able to pass in site object for tile rendering
+  [vangheem]
+
 
 3.0.0 (2015-09-16)
 ------------------
