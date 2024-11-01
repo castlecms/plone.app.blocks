@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from ConfigParser import SafeConfigParser
+from six.moves.configparser import SafeConfigParser
 import logging
 
 from App.config import getConfiguration
@@ -157,7 +157,7 @@ class _AvailableLayoutsVocabulary(object):
             used.append(path)
             items[_id] = SimpleTerm(path, _id, title)
 
-        items = sorted(items.values(), key=lambda term: term.title)
+        items = sorted(list(items.values()), key=lambda term: term.title)
         return SimpleVocabulary(items)
 
 

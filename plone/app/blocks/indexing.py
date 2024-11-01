@@ -6,6 +6,7 @@ from plone.app.contenttypes import indexers
 from plone.indexer.decorator import indexer
 from plone.tiles.data import ANNOTATIONS_KEY_PREFIX
 from zope.annotation.interfaces import IAnnotations
+import six
 
 
 concat = indexers._unicode_save_string_concat
@@ -33,7 +34,7 @@ def LayoutSearchableText(obj):
                 continue
             for field_name in ('title', 'label', 'content'):
                 val = data.get(field_name)
-                if isinstance(val, basestring):
+                if isinstance(val, six.string_types):
                     text.append(val)
     if not behavior_data.contentLayout and behavior_data.content:
         dom = fromstring(behavior_data.content)

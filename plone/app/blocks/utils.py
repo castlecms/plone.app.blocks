@@ -19,6 +19,7 @@ from zope.component import getUtility
 from zope.component import queryUtility
 from zope.security.interfaces import IPermission
 from zope.site.hooks import getSite
+import six
 
 
 headXPath = etree.XPath("/html/head")
@@ -60,7 +61,7 @@ def resolve(url, resolved=None):
     if not resolved.strip():
         return None
     try:
-        if isinstance(resolved, unicode):
+        if isinstance(resolved, six.text_type):
             html_parser = html.HTMLParser(encoding='utf-8')
             return html.fromstring(resolved.encode('utf-8'),
                                    parser=html_parser).getroottree()
@@ -116,7 +117,7 @@ def xpath1(xpath, node, strict=True):
     """Return a single node matched by the given etree.XPath object.
     """
 
-    if isinstance(xpath, basestring):
+    if isinstance(xpath, six.string_types):
         xpath = etree.XPath(xpath)
 
     result = xpath(node)
@@ -207,7 +208,7 @@ def _getWidgetName(field, widgets, request):
         factory = widgets[field.__name__]
     else:
         factory = getMultiAdapter((field, request), IFieldWidget)
-    if isinstance(factory, basestring):
+    if isinstance(factory, six.string_types):
         return factory
     if not isinstance(factory, type):
         factory = factory.__class__
@@ -216,7 +217,7 @@ def _getWidgetName(field, widgets, request):
 
 def isVisible(name, omitted):
     value = omitted.get(name, False)
-    if isinstance(value, basestring):
+    if isinstance(value, six.string_types):
         return value == 'false'
     else:
         return not bool(value)
