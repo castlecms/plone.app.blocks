@@ -1,25 +1,22 @@
 # -*- coding: utf-8 -*-
-from six.moves.configparser import SafeConfigParser
 import logging
 
 from App.config import getConfiguration
-from Products.CMFCore.utils import getToolByName
-from plone.app.blocks.interfaces import CONTENT_LAYOUT_FILE_NAME
-from plone.app.blocks.interfaces import CONTENT_LAYOUT_MANIFEST_FORMAT
-from plone.app.blocks.interfaces import CONTENT_LAYOUT_RESOURCE_NAME
-from plone.memoize import view
-from plone.memoize import volatile
+from plone.app.blocks.interfaces import (CONTENT_LAYOUT_FILE_NAME,
+                                         CONTENT_LAYOUT_MANIFEST_FORMAT,
+                                         CONTENT_LAYOUT_RESOURCE_NAME)
+from plone.memoize import view, volatile
 from plone.resource.manifest import MANIFEST_FILENAME
 from plone.resource.traversal import ResourceTraverser
 from plone.resource.utils import iterDirectoriesOfType
+from Products.CMFCore.utils import getToolByName
+from six.moves.configparser import SafeConfigParser
 from zope.annotation import IAnnotations
+from zope.dottedname.resolve import resolve
 from zope.globalrequest import getRequest
 from zope.interface import implements
 from zope.schema.interfaces import IVocabularyFactory
-from zope.schema.vocabulary import SimpleTerm
-from zope.schema.vocabulary import SimpleVocabulary
-from zope.dottedname.resolve import resolve
-
+from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
 logger = logging.getLogger('plone.app.blocks')
 

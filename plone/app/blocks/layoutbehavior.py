@@ -1,20 +1,16 @@
 # -*- coding: utf-8 -*-
-from hashlib import md5
 import logging
+from hashlib import md5
 
 from lxml import html
-from plone.app.blocks.interfaces import ILayoutField
-from plone.app.blocks.interfaces import IOmittedField
-from plone.app.blocks.interfaces import _
+from plone.app.blocks.interfaces import ILayoutField, IOmittedField, _
+from plone.autoform import directives as form
 from plone.autoform.directives import write_permission
 from plone.autoform.interfaces import IFormFieldProvider
 from plone.memoize.ram import cache
 from plone.supermodel import model
 from zope import schema
-from zope.interface import alsoProvides
-from zope.interface import implements
-from plone.autoform import directives as form
-
+from zope.interface import alsoProvides, implements
 
 logger = logging.getLogger('plone.app.blocks')
 
@@ -90,9 +86,7 @@ def applyTilePersistent(path, resolved):
 
     (Path is required for proper error message when lxml parser fails.)
     """
-    from plone.app.blocks.utils import tileAttrib
-    from plone.app.blocks.utils import bodyTileXPath
-    from plone.app.blocks.utils import resolve
+    from plone.app.blocks.utils import bodyTileXPath, resolve, tileAttrib
     tree = resolve(path, resolved=resolved)
     for node in bodyTileXPath(tree):
         url = node.attrib[tileAttrib]

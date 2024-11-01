@@ -1,25 +1,18 @@
 # -*- coding: utf-8 -*-
-from AccessControl import Unauthorized
-from AccessControl.SecurityManagement import getSecurityManager
-from lxml import etree
-from lxml import html
-from plone import api
-from plone.app.blocks import formparser
-from plone.app.blocks import utils
-from plone.tiles import data as tiles_data
-from plone.tiles.interfaces import ITile
-from plone.tiles.interfaces import ITileDataManager
-from six.moves.urllib.parse import unquote
-from six.moves.urllib.parse import urljoin
-from zExceptions import NotFound
-from zope.component import adapter
-from zope.component import ComponentLookupError
-from zope.component import getMultiAdapter
-from zope.interface import implementer
-from zope.schema import getFields
-
 import logging
 
+from AccessControl import Unauthorized
+from AccessControl.SecurityManagement import getSecurityManager
+from lxml import etree, html
+from plone import api
+from plone.app.blocks import formparser, utils
+from plone.tiles import data as tiles_data
+from plone.tiles.interfaces import ITile, ITileDataManager
+from six.moves.urllib.parse import unquote, urljoin
+from zExceptions import NotFound
+from zope.component import ComponentLookupError, adapter, getMultiAdapter
+from zope.interface import implementer
+from zope.schema import getFields
 
 logger = logging.getLogger('plone.app.blocks')
 

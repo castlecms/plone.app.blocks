@@ -6,9 +6,7 @@ from plone.app.blocks import utils
 from plone.app.blocks.interfaces import IBlocksSettings
 from plone.registry.interfaces import IRegistry
 from zope.component import queryUtility
-from zope.interface import Interface
-from zope.interface import implements
-
+from zope.interface import Interface, implements
 
 logger = logging.getLogger('plone.app.blocks')
 

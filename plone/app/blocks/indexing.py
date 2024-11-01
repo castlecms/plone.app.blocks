@@ -1,13 +1,11 @@
-from Products.CMFPlone.utils import safe_unicode
-from lxml.html import fromstring
-from lxml.html import tostring
+import six
+from lxml.html import fromstring, tostring
 from plone.app.blocks.layoutbehavior import ILayoutAware
 from plone.app.contenttypes import indexers
 from plone.indexer.decorator import indexer
 from plone.tiles.data import ANNOTATIONS_KEY_PREFIX
+from Products.CMFPlone.utils import safe_unicode
 from zope.annotation.interfaces import IAnnotations
-import six
-
 
 concat = indexers._unicode_save_string_concat
 

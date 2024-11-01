@@ -1,26 +1,21 @@
 # -*- coding: utf-8 -*-
 import logging
 
+import six
 from AccessControl import getSecurityManager
 from App.config import getConfiguration
-from lxml import etree
-from lxml import html
+from lxml import etree, html
 from plone.app.blocks.interfaces import DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY
-from plone.app.blocks.layoutbehavior import ILayoutAware
-from plone.app.blocks.layoutbehavior import applyTilePersistent
+from plone.app.blocks.layoutbehavior import ILayoutAware, applyTilePersistent
 from plone.memoize.volatile import DontCache
 from plone.registry.interfaces import IRegistry
 from plone.resource.utils import queryResourceDirectory
 from plone.subrequest import subrequest
 from z3c.form.interfaces import IFieldWidget
 from zExceptions import NotFound
-from zope.component import getMultiAdapter
-from zope.component import getUtility
-from zope.component import queryUtility
+from zope.component import getMultiAdapter, getUtility, queryUtility
 from zope.security.interfaces import IPermission
 from zope.site.hooks import getSite
-import six
-
 
 headXPath = etree.XPath("/html/head")
 layoutAttrib = 'data-layout'

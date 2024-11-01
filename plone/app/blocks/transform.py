@@ -1,14 +1,13 @@
 # -*- coding: utf-8 -*-
-from lxml import etree
-from lxml import html
+import re
+
+from lxml import etree, html
 from OFS.Image import File
 from plone.app.blocks import gridsystem
 from plone.transformchain.interfaces import ITransform
 from repoze.xmliter.serializer import XMLSerializer
 from repoze.xmliter.utils import getHTMLSerializer
 from zope.interface import implements
-
-import re
 
 
 class ParseXML(object):

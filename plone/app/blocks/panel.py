@@ -1,11 +1,7 @@
 # -*- coding: utf-8 -*-
-from six.moves.urllib.parse import urlencode
-from six.moves.urllib.parse import urljoin
-from six.moves.urllib.parse import urlparse
-from six.moves.urllib.parse import parse_qs
-from six.moves.urllib.parse import urlunparse
-
 from plone.app.blocks import utils
+from six.moves.urllib.parse import (parse_qs, urlencode, urljoin, urlparse,
+                                    urlunparse)
 
 
 def merge(request, pageTree, removePanelLinks=False, removeLayoutLink=True):

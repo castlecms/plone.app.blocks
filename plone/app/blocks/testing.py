@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
-from plone.app.testing import FunctionalTesting
-from plone.app.testing import IntegrationTesting
-from plone.app.testing import PLONE_FIXTURE
-from plone.app.testing import PloneSandboxLayer
+import pkg_resources
+from plone.app.testing import (PLONE_FIXTURE, FunctionalTesting,
+                               IntegrationTesting, PloneSandboxLayer)
 from plone.testing import Layer
 from zope.configuration import xmlconfig
-import pkg_resources
 
 try:
     pkg_resources.get_distribution('plone.app.contenttypes')
@@ -71,8 +69,8 @@ class BlocksLayer(PloneSandboxLayer):
         if 'virtual_hosting' not in app.objectIds():
             # If ZopeLite was imported, we have no default virtual
             # host monster
-            from Products.SiteAccess.VirtualHostMonster \
-                import manage_addVirtualHostMonster
+            from Products.SiteAccess.VirtualHostMonster import \
+                manage_addVirtualHostMonster
             manage_addVirtualHostMonster(app, 'virtual_hosting')
 
     def setUpPloneSite(self, portal):

@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from setuptools import find_packages
-from setuptools import setup
-
 import os
+
+from setuptools import find_packages, setup
 
 version = '10.0.28'
 widgets_require = [

@@ -4,7 +4,6 @@ from zope import schema
 from zope.i18nmessageid import MessageFactory
 from zope.interface import Interface
 
-
 CONTENT_LAYOUT_RESOURCE_NAME = 'contentlayout'
 CONTENT_LAYOUT_FILE_NAME = "content.html"
 DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY = 'plone.app.blocks.default_layout'

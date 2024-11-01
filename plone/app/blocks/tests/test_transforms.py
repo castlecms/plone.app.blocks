@@ -1,16 +1,13 @@
 # -*- coding: utf-8 -*-
 import unittest
 
-from plone.app.blocks.interfaces import IBlocksLayer
-from plone.app.blocks.interfaces import IBlocksSettings
-from plone.app.blocks.interfaces import IBlocksTransformEnabled
+from plone.app.blocks.interfaces import (IBlocksLayer, IBlocksSettings,
+                                         IBlocksTransformEnabled)
 from plone.app.blocks.testing import BLOCKS_INTEGRATION_TESTING
 from plone.registry.interfaces import IRegistry
 from plone.transformchain.zpublisher import applyTransform
 from zope.component import queryUtility
-from zope.interface import alsoProvides
-from zope.interface import implements
-
+from zope.interface import alsoProvides, implements
 
 gridsystem_test_body = """\
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">

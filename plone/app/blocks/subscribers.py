@@ -1,8 +1,8 @@
 from lxml.html import fromstring
 from plone.app.blocks import utils
+from plone.app.blocks.utils import getLayout
 from plone.tiles.data import ANNOTATIONS_KEY_PREFIX
 from zope.annotation.interfaces import IAnnotations
-from plone.app.blocks.utils import getLayout
 
 
 def onLayoutEdited(obj, event):

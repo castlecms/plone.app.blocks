@@ -1,17 +1,16 @@
 from lxml import etree
-from lxml.html import tostring
-from lxml.html import fromstring
-from plone.app.theming.utils import theming_policy
-from plone.app.blocks.layoutbehavior import ERROR_LAYOUT
+from lxml.html import fromstring, tostring
 from plone.app.blocks.interfaces import IBlocksTransformEnabled
+from plone.app.blocks.layoutbehavior import ERROR_LAYOUT
 from plone.app.blocks.utils import getLayout
-from castle.cms.theming import renderWithTheme
+from plone.app.theming.utils import theming_policy
 from plone.dexterity.browser.view import DefaultView
 from plone.outputfilters import apply_filters
 from plone.outputfilters.interfaces import IFilter
 from zope.component import getAdapters
 from zope.interface import implements
 
+from castle.cms.theming import renderWithTheme
 
 panel_xpath = etree.XPath("//*[@data-panel]")
 

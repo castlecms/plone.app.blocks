@@ -43,13 +43,13 @@ $Id: $
 """
 __docformat__ = 'restructuredtext'
 
-from cgi import FieldStorage
-from cStringIO import StringIO
 import re
-from zope.interface.common.mapping import IExtendedReadMapping
-import six
-from six.moves import map
+from cgi import FieldStorage
 
+import six
+from cStringIO import StringIO
+from six.moves import map
+from zope.interface.common.mapping import IExtendedReadMapping
 
 newlines = re.compile('\r\n|\n\r|\r')
 array_types = (list, tuple)

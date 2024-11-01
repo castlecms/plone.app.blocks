@@ -6,7 +6,6 @@ from zope.interface import implements
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleVocabulary
 
-
 CACHE_REQ_KEY = 'plone.sitelayouts'
 
 class AvailableSiteLayoutsFactory(object):
