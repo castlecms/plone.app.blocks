@@ -8,7 +8,7 @@ from plone.app.testing import TEST_USER_ID, setRoles
 from plone.registry.interfaces import IRegistry
 from plone.uuid.interfaces import IUUID
 from zope.component import adapts, getGlobalSiteManager, getUtility
-from zope.interface import implements
+from zope.interface import implementer
 
 try:
     pkg_resources.get_distribution('plone.app.contenttypes')
@@ -38,8 +38,8 @@ class TestLayoutBehavior(unittest.TestCase):
         else:
             iface = self.portal['f1']['d1'].__class__
 
+        @implementer(ILayoutAware)
         class DocumentLayoutAware(object):
-            implements(ILayoutAware)
             adapts(iface)
 
             def __init__(self, context):

@@ -250,4 +250,4 @@ def getLayout(content):
             layout = applyTilePersistent(path, resolved)
         except (KeyError, NotFound, RuntimeError):
             pass
-    return layout
+    return six.text_type(layout, 'utf-8')

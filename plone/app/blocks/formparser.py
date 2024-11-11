@@ -47,7 +47,7 @@ import re
 from cgi import FieldStorage
 
 import six
-from cStringIO import StringIO
+from io import StringIO
 from six.moves import map
 from zope.interface.common.mapping import IExtendedReadMapping
 
@@ -172,7 +172,9 @@ CONVERTED = 32
 
 def decode_utf8(s):
     """Decode a UTF-8 string"""
-    return six.text_type(s, 'utf-8')
+    if isinstance(s, bytes):
+        return six.text_type(s, 'utf-8')
+    return s
 
 
 def _remove_mini_storage_wrapper(value):

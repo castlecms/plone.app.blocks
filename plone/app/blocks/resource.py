@@ -14,7 +14,7 @@ from six.moves.configparser import SafeConfigParser
 from zope.annotation import IAnnotations
 from zope.dottedname.resolve import resolve
 from zope.globalrequest import getRequest
-from zope.interface import implements
+from zope.interface import implementer
 from zope.schema.interfaces import IVocabularyFactory
 from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
@@ -31,10 +31,10 @@ class ContentLayoutTraverser(ResourceTraverser):
     name = CONTENT_LAYOUT_RESOURCE_NAME
 
 
+@implementer(IAnnotations)
 class AnnotationsDict(dict):
     """Volatile annotations dictionary to pass to view.memoize_contextless when
     request thread local is not set"""
-    implements(IAnnotations)
 
 
 class multidict(dict):
@@ -126,11 +126,10 @@ def getLayoutsFromResources(_format):
     return layouts
 
 
+@implementer(IVocabularyFactory)
 class _AvailableLayoutsVocabulary(object):
     """Vocabulary to return request cached available layouts of a given type
     """
-
-    implements(IVocabularyFactory)
 
     def __init__(self):
         self.request = getRequest() or AnnotationsDict()
@@ -158,11 +157,10 @@ class _AvailableLayoutsVocabulary(object):
         return SimpleVocabulary(items)
 
 
+@implementer(IVocabularyFactory)
 class AvailableLayoutsVocabulary(object):
     """Vocabulary to return available layouts of a given type
     """
-
-    implements(IVocabularyFactory)
 
     def __init__(self, format, defaultFilename):
         self.format = format

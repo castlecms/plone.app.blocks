@@ -10,7 +10,7 @@ from plone.autoform.interfaces import IFormFieldProvider
 from plone.memoize.ram import cache
 from plone.supermodel import model
 from zope import schema
-from zope.interface import alsoProvides, implements
+from zope.interface import alsoProvides, implementer
 
 logger = logging.getLogger('plone.app.blocks')
 
@@ -26,11 +26,10 @@ Could not find layout for content
 </html>"""
 
 
+@implementer(ILayoutField)
 class LayoutField(schema.Text):
     """A field used to store layout information
     """
-
-    implements(ILayoutField)
 
 
 class ILayoutAware(model.Schema):
