@@ -47,6 +47,8 @@ from cgi import FieldStorage
 from cStringIO import StringIO
 import re
 from zope.interface.common.mapping import IExtendedReadMapping
+import six
+from six.moves import map
 
 
 newlines = re.compile('\r\n|\n\r|\r')
@@ -54,7 +56,7 @@ array_types = (list, tuple)
 
 
 def field2string(v):
-    if not isinstance(v, basestring):
+    if not isinstance(v, six.string_types):
         if hasattr(v, 'value'):
             v = v.value
         else:
@@ -75,7 +77,7 @@ def field2required(v):
 
 def field2int(v):
     if isinstance(v, array_types):
-        return map(field2int, v)
+        return list(map(field2int, v))
     v = field2string(v)
     if not v:
         raise ValueError('Empty entry when integer expected')
@@ -87,7 +89,7 @@ def field2int(v):
 
 def field2float(v):
     if isinstance(v, array_types):
-        return map(field2float, v)
+        return list(map(field2float, v))
     v = field2string(v)
     if not v:
         raise ValueError('Empty entry when float expected')
@@ -99,7 +101,7 @@ def field2float(v):
 
 def field2long(v):
     if isinstance(v, array_types):
-        return map(field2long, v)
+        return list(map(field2long, v))
     v = field2string(v)
 
     # handle trailing 'L' if present.
@@ -108,7 +110,7 @@ def field2long(v):
     if not v:
         raise ValueError('Empty entry when integer expected')
     try:
-        return long(v)
+        return int(v)
     except ValueError:
         raise ValueError("A long integer was expected in the value '%s'" % v)
 
@@ -170,7 +172,7 @@ CONVERTED = 32
 
 def decode_utf8(s):
     """Decode a UTF-8 string"""
-    return unicode(s, 'utf-8')
+    return six.text_type(s, 'utf-8')
 
 
 def _remove_mini_storage_wrapper(value):
@@ -304,7 +306,7 @@ class FormParser(object):
         if key is not None:
             key = self._to_unicode(key)
 
-        if isinstance(item, basestring):
+        if isinstance(item, six.string_types):
             item = self._to_unicode(item)
 
         if tuple_item:
@@ -428,7 +430,7 @@ class FormParser(object):
         """Insert defaults into the form dictionary."""
         form = self.form
 
-        for keys, values in self._defaults.iteritems():
+        for keys, values in six.iteritems(self._defaults):
             if keys not in form:
                 form[keys] = values
             else:
@@ -465,12 +467,12 @@ class Record(object):
         return self.__dict__[key]
 
     def __str__(self):
-        items = self.__dict__.items()
+        items = list(self.__dict__.items())
         items.sort()
         return "{" + ", ".join(["%s: %s" % item for item in items]) + "}"
 
     def __repr__(self):
-        items = self.__dict__.items()
+        items = list(self.__dict__.items())
         items.sort()
         return ("{"
             + ", ".join(["%s: %s" % (repr(key), repr(value))  # noqa

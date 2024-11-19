@@ -11,13 +11,14 @@ from zope.interface import implementer
 from zope.interface import Interface
 
 import unittest
+import six
 
 
 try:
     # Python 2: "unicode" is built-in
-    unicode
+    six.text_type
 except NameError:
-    unicode = str
+    six.text_type = str
 
 
 class ITestTile(Interface):
@@ -234,7 +235,7 @@ class TestRenderTiles(unittest.TestCase):
         request = self.layer["request"]
         tree = serializer.tree
         renderTiles(request, tree)
-        result = unicode(serializer)
+        result = six.text_type(serializer)
         self.assertIn("This is a demo tile with id tile2", result)
         self.assertIn("This is a demo tile with id tile3", result)
         self.assertIn("This is a demo tile with id tile4", result)

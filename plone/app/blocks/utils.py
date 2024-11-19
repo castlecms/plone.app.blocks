@@ -266,7 +266,7 @@ def _getWidgetName(field, widgets, request):
 
 def isVisible(name, omitted):
     value = omitted.get(name, False)
-    if isinstance(value, basestring):
+    if isinstance(value, six.string_types):
         return value == 'false'
     else:
         return not bool(value)
