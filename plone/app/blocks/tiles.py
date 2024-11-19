@@ -1,22 +1,18 @@
 # -*- coding: utf-8 -*-
+import logging
+
 from lxml import html
 from lxml.etree import XSLTApplyError
-from plone.app.blocks import events
-from plone.app.blocks import PloneMessageFactory
-from plone.app.blocks import utils
+from plone.app.blocks import PloneMessageFactory, events, utils
 from plone.app.blocks.interfaces import IBlocksSettings
 from plone.app.blocks.utils import resolve_transform
 from plone.registry.interfaces import IRegistry
-from plone.tiles.interfaces import ESI_HEADER
-from plone.tiles.interfaces import ESI_HEADER_KEY
+from plone.tiles.interfaces import ESI_HEADER, ESI_HEADER_KEY
 from six.moves.urllib import parse
 from zExceptions import NotFound
 from zope.component import queryUtility
 from zope.event import notify
 from zope.i18n import translate
-
-import logging
-
 
 logger = logging.getLogger(__name__)
 

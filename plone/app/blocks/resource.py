@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
+import logging
+
+import six
 from App.config import getConfiguration
-from plone.app.blocks.interfaces import CONTENT_LAYOUT_FILE_NAME
-from plone.app.blocks.interfaces import CONTENT_LAYOUT_MANIFEST_FORMAT
-from plone.app.blocks.interfaces import CONTENT_LAYOUT_RESOURCE_NAME
-from plone.memoize import view
-from plone.memoize import volatile
+from plone.app.blocks.interfaces import (CONTENT_LAYOUT_FILE_NAME,
+                                         CONTENT_LAYOUT_MANIFEST_FORMAT,
+                                         CONTENT_LAYOUT_RESOURCE_NAME)
+from plone.memoize import view, volatile
 from plone.resource.manifest import MANIFEST_FILENAME
 from plone.resource.traversal import ResourceTraverser
 from plone.resource.utils import iterDirectoriesOfType
@@ -12,20 +14,14 @@ from Products.CMFCore.utils import getToolByName
 from six.moves.configparser import ConfigParser
 from six.moves.urllib import parse
 from zope.annotation import IAnnotations
+from zope.dottedname.resolve import resolve
 from zope.globalrequest import getRequest
 from zope.interface import implementer
 from zope.schema.interfaces import IVocabularyFactory
-from zope.schema.vocabulary import SimpleTerm
-from zope.schema.vocabulary import SimpleVocabulary
-from zope.dottedname.resolve import resolve
-
-import logging
-import six
-
+from zope.schema.vocabulary import SimpleTerm, SimpleVocabulary
 
 try:
-    from configparser import DEFAULTSECT
-    from configparser import SectionProxy
+    from configparser import DEFAULTSECT, SectionProxy
 
 except ImportError:
     # python 2.7 fallback for multidict

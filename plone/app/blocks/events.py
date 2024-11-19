@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from plone.app.blocks.interfaces import IAfterTileRenderEvent
-from plone.app.blocks.interfaces import IBeforeTileRenderEvent
+from plone.app.blocks.interfaces import (IAfterTileRenderEvent,
+                                         IBeforeTileRenderEvent)
 from zope.interface import implementer
 
 

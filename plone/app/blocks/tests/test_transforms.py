@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
-from plone.app.blocks.interfaces import IBlocksLayer
-from plone.app.blocks.interfaces import IBlocksTransformEnabled
+import unittest
+
+from plone.app.blocks.interfaces import IBlocksLayer, IBlocksTransformEnabled
 from plone.app.blocks.testing import BLOCKS_INTEGRATION_TESTING
 from plone.app.blocks.transform import ParseXML
 from plone.transformchain.zpublisher import applyTransform
-from zope.interface import alsoProvides
-from zope.interface import implementer
-
-import unittest
+from zope.interface import alsoProvides, implementer
 
 
 @implementer(IBlocksTransformEnabled)

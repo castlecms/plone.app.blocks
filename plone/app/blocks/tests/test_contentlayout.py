@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
+import unittest
+
+import pkg_resources
 from lxml import html
 from plone.app.blocks.testing import BLOCKS_FUNCTIONAL_TESTING
-from plone.app.testing import setRoles
-from plone.app.testing import TEST_USER_ID
+from plone.app.testing import TEST_USER_ID, setRoles
 from plone.registry.interfaces import IRegistry
 from plone.tiles.data import ANNOTATIONS_KEY_PREFIX
 from zope.annotation.interfaces import IAnnotations
-from zope.component import getGlobalSiteManager
-from zope.component import getUtility
+from zope.component import getGlobalSiteManager, getUtility
 from zope.schema.interfaces import IVocabularyFactory
-
-import pkg_resources
-import unittest
-
 
 try:
     pkg_resources.get_distribution("plone.app.contenttypes")
@@ -43,8 +40,8 @@ class TestContentLayout(unittest.TestCase):
         else:
             iface = self.portal["f1"]["d1"].__class__
 
-        from plone.app.blocks.layoutbehavior import ILayoutAware
-        from plone.app.blocks.layoutbehavior import LayoutAwareBehavior
+        from plone.app.blocks.layoutbehavior import (ILayoutAware,
+                                                     LayoutAwareBehavior)
 
         sm = getGlobalSiteManager()
         sm.registerAdapter(LayoutAwareBehavior, [iface])
@@ -87,8 +84,7 @@ class TestContentLayout(unittest.TestCase):
 
     def test_content_layout(self):
         from plone.app.blocks.layoutviews import ContentLayoutView
-        from plone.app.blocks.utils import bodyTileXPath
-        from plone.app.blocks.utils import tileAttrib
+        from plone.app.blocks.utils import bodyTileXPath, tileAttrib
 
         self.behavior.contentLayout = "/++contentlayout++testlayout1/content.html"
         rendered = ContentLayoutView(self.portal["f1"]["d1"], self.request)()

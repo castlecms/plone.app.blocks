@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
+import pkg_resources
+import six
 from lxml.html import fromstring
-from plone.app.blocks.layoutbehavior import ILayoutAware
-from plone.app.blocks.layoutbehavior import ILayoutBehaviorAdaptable
+from plone.app.blocks.layoutbehavior import (ILayoutAware,
+                                             ILayoutBehaviorAdaptable)
 from plone.indexer.decorator import indexer
 from plone.tiles.data import ANNOTATIONS_KEY_PREFIX
 from Products.CMFPlone.utils import safe_unicode
@@ -9,18 +11,13 @@ from zope.annotation.interfaces import IAnnotations
 from zope.component import adapter
 from zope.interface import implementer
 
-import pkg_resources
-import six
-
-
 try:
     pkg_resources.get_distribution("collective.dexteritytextindexer")
 except pkg_resources.DistributionNotFound:
     HAS_DEXTERITYTEXTINDEXER = False
 else:
-    from collective.dexteritytextindexer.interfaces import (
-        IDynamicTextIndexExtender,
-    )  # noqa
+    from collective.dexteritytextindexer.interfaces import \
+        IDynamicTextIndexExtender  # noqa
 
     HAS_DEXTERITYTEXTINDEXER = True
 

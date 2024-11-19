@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-from plone.app.blocks.testing import BLOCKS_FUNCTIONAL_TESTING
-from plone.app.blocks.utils import resolve
-from plone.app.blocks.utils import resolveResource
-
 import unittest
+
+from plone.app.blocks.testing import BLOCKS_FUNCTIONAL_TESTING
+from plone.app.blocks.utils import resolve, resolveResource
 
 
 class TestUtils(unittest.TestCase):

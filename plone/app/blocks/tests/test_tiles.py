@@ -1,18 +1,15 @@
 # -*- coding: utf-8 -*-
+import unittest
+
+import six
 from plone.app.blocks.testing import BLOCKS_FIXTURE
 from plone.app.blocks.tiles import renderTiles
-from plone.app.testing import IntegrationTesting
-from plone.app.testing import PloneSandboxLayer
+from plone.app.testing import IntegrationTesting, PloneSandboxLayer
 from plone.tiles import Tile
 from repoze.xmliter.utils import getHTMLSerializer
 from zope import schema
 from zope.configuration import xmlconfig
-from zope.interface import implementer
-from zope.interface import Interface
-
-import unittest
-import six
-
+from zope.interface import Interface, implementer
 
 try:
     # Python 2: "unicode" is built-in

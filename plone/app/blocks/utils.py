@@ -1,31 +1,24 @@
 # -*- coding: utf-8 -*-
+import logging
+from copy import deepcopy
+from hashlib import md5
+
+import six
+import zope.deferredimport
 from AccessControl import getSecurityManager
 from App.config import getConfiguration
-from copy import deepcopy
-from diazo import compiler
-from diazo import cssrules
-from diazo import rules
-from diazo import utils
-from hashlib import md5
-from lxml import etree
-from lxml import html
+from diazo import compiler, cssrules, rules, utils
+from lxml import etree, html
 from plone.memoize import ram
 from plone.memoize.volatile import DontCache
 from plone.resource.utils import queryResourceDirectory
 from plone.subrequest import subrequest
 from six.moves.urllib import parse
 from z3c.form.interfaces import IFieldWidget
-from zExceptions import NotFound
-from zExceptions import Unauthorized
-from zope.component import getMultiAdapter
-from zope.component import queryUtility
+from zExceptions import NotFound, Unauthorized
+from zope.component import getMultiAdapter, queryUtility
 from zope.component.hooks import getSite
 from zope.security.interfaces import IPermission
-
-import logging
-import six
-import zope.deferredimport
-
 
 zope.deferredimport.deprecated(
     "Moved in own behavior due to avoid circular imports. "

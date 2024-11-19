@@ -2,9 +2,7 @@
 from plone.resource.manifest import ManifestFormat
 from zope import schema
 from zope.i18nmessageid import MessageFactory
-from zope.interface import Attribute
-from zope.interface import Interface
-
+from zope.interface import Attribute, Interface
 
 SITE_LAYOUT_RESOURCE_NAME = "sitelayout"
 CONTENT_LAYOUT_RESOURCE_NAME = "contentlayout"

@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
-from plone.app.blocks.layoutbehavior import ILayoutAware
-from plone.app.blocks.layoutbehavior import ILayoutBehaviorAdaptable
-from plone.app.blocks.layoutbehavior import LayoutAwareTileDataStorage
+import unittest
+
+import pkg_resources
+from plone.app.blocks.layoutbehavior import (ILayoutAware,
+                                             ILayoutBehaviorAdaptable,
+                                             LayoutAwareTileDataStorage)
 from plone.app.blocks.testing import BLOCKS_FUNCTIONAL_TESTING
-from plone.app.testing import setRoles
-from plone.app.testing import TEST_USER_ID
-from plone.app.textfield import RichText
-from plone.app.textfield import RichTextValue
+from plone.app.testing import TEST_USER_ID, setRoles
+from plone.app.textfield import RichText, RichTextValue
 from plone.dexterity.fti import DexterityFTI
 from plone.registry.interfaces import IRegistry
 from plone.rfc822.interfaces import IPrimaryField
@@ -14,13 +15,8 @@ from plone.supermodel.model import Schema
 from plone.tiles.interfaces import ITileType
 from plone.tiles.type import TileType
 from plone.uuid.interfaces import IUUID
-from zope.component import getUtility
-from zope.component import provideUtility
+from zope.component import getUtility, provideUtility
 from zope.interface import alsoProvides
-
-import pkg_resources
-import unittest
-
 
 try:
     pkg_resources.get_distribution("plone.app.contenttypes")

@@ -1,23 +1,18 @@
 # -*- coding: utf-8 -*-
-from lxml import etree
-from lxml import html
-from plone.app.blocks import panel
-from plone.app.blocks import tiles
+import logging
+import re
+
+from lxml import etree, html
+# Legacy imports
+from OFS.Image import File
+# Plone5.2 TODO - Remove 'gridsystem' references
+from plone.app.blocks import gridsystem, panel, tiles
 from plone.tiles import esi
 from plone.tiles.interfaces import ESI_HEADER
-# Plone5.2 TODO - Remove 'gridsystem' references
-from plone.app.blocks import gridsystem
 from plone.transformchain.interfaces import ITransform
 from repoze.xmliter.serializer import XMLSerializer
 from repoze.xmliter.utils import getHTMLSerializer
 from zope.interface import implementer
-
-import logging
-import re
-
-# Legacy imports
-from OFS.Image import File
-
 
 try:
     # Plone 5.2+

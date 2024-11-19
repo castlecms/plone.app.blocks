@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from plone.app.blocks.layoutbehavior import ILayoutAware
-from plone.app.blocks.layoutbehavior import ILayoutBehaviorAdaptable
-from plone.app.drafts.interfaces import IDraft
-from plone.app.drafts.interfaces import IDraftSyncer
+from plone.app.blocks.layoutbehavior import (ILayoutAware,
+                                             ILayoutBehaviorAdaptable)
+from plone.app.drafts.interfaces import IDraft, IDraftSyncer
 from zope.component import adapter
 from zope.interface import implementer
 

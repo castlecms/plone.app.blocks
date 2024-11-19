@@ -1,14 +1,15 @@
 import re
 
 from Acquisition import aq_parent
-from plone.app.blocks.layoutbehavior import ILayoutBehaviorAdaptable
 from plone.app.blocks import utils
+from plone.app.blocks.layoutbehavior import ILayoutBehaviorAdaptable
 from plone.app.linkintegrity.interfaces import IRetriever
 from plone.app.linkintegrity.retriever import DXGeneral
 from plone.tiles.interfaces import ITile
 from repoze.xmliter.utils import getHTMLSerializer
 from zope.component import adapter
 from zope.interface import implementer
+
 try:
     # Plone 5.2+
     from Products.CMFPlone.utils import safe_bytes

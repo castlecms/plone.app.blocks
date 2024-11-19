@@ -1,18 +1,14 @@
 # -*- coding: utf-8 -*-
-from plone.app.blocks.interfaces import DEFAULT_SITE_LAYOUT_REGISTRY_KEY
-from plone.app.blocks.layoutbehavior import ILayoutAware
-from plone.app.blocks.layoutbehavior import LayoutAwareBehavior
-from plone.app.blocks.testing import BLOCKS_FUNCTIONAL_TESTING
-from plone.app.testing import setRoles
-from plone.app.testing import TEST_USER_ID
-from plone.registry.interfaces import IRegistry
-from zExceptions import NotFound
-from zope.component import getGlobalSiteManager
-from zope.component import getMultiAdapter
-from zope.component import getUtility
+import unittest
 
 import transaction
-import unittest
+from plone.app.blocks.interfaces import DEFAULT_SITE_LAYOUT_REGISTRY_KEY
+from plone.app.blocks.layoutbehavior import ILayoutAware, LayoutAwareBehavior
+from plone.app.blocks.testing import BLOCKS_FUNCTIONAL_TESTING
+from plone.app.testing import TEST_USER_ID, setRoles
+from plone.registry.interfaces import IRegistry
+from zExceptions import NotFound
+from zope.component import getGlobalSiteManager, getMultiAdapter, getUtility
 
 
 class TestPageSiteLayout(unittest.TestCase):

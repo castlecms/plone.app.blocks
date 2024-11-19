@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
-from plone.app.blocks.interfaces import CONTENT_LAYOUT_MANIFEST_FORMAT
-from plone.app.blocks.interfaces import SITE_LAYOUT_MANIFEST_FORMAT
+import unittest
+
+from plone.app.blocks.interfaces import (CONTENT_LAYOUT_MANIFEST_FORMAT,
+                                         SITE_LAYOUT_MANIFEST_FORMAT)
 from plone.app.blocks.resource import getLayoutsFromResources
 from plone.app.blocks.testing import BLOCKS_FUNCTIONAL_TESTING
-
-import unittest
 
 
 class TestResource(unittest.TestCase):

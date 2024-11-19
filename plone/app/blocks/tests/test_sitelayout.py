@@ -1,30 +1,24 @@
 # -*- coding: utf-8 -*-
-from lxml import etree
-from lxml import html
+import unittest
+
+import six
+import transaction
+from lxml import etree, html
 from OFS.Image import File
 from plone.app.blocks.interfaces import DEFAULT_SITE_LAYOUT_REGISTRY_KEY
 from plone.app.blocks.panel import merge
 from plone.app.blocks.testing import BLOCKS_FUNCTIONAL_TESTING
-from plone.app.testing import setRoles
-from plone.app.testing import TEST_USER_ID
+from plone.app.testing import TEST_USER_ID, setRoles
 from plone.memoize.volatile import ATTR
 from plone.registry.interfaces import IRegistry
 from Products.BTreeFolder2.BTreeFolder2 import BTreeFolder2
 from Products.CMFPlone.utils import getToolByName
 from zExceptions import NotFound
-from zope.component import adapter
-from zope.component import getMultiAdapter
-from zope.component import getSiteManager
-from zope.component import getUtility
-from zope.component import provideAdapter
-from zope.interface import implementer
-from zope.interface import Interface
+from zope.component import (adapter, getMultiAdapter, getSiteManager,
+                            getUtility, provideAdapter)
+from zope.interface import Interface, implementer
 from zope.publisher.browser import BrowserPage
 from zope.publisher.interfaces.browser import IBrowserPage
-
-import six
-import transaction
-import unittest
 
 
 class TestSiteLayout(unittest.TestCase):

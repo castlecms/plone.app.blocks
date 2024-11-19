@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
-from Acquisition import aq_base
-from Acquisition import aq_inner
-from Acquisition import aq_parent
-from lxml import etree
-from lxml import html
-from plone.app.blocks.interfaces import _
-from plone.app.blocks.interfaces import DEFAULT_AJAX_LAYOUT_REGISTRY_KEY
-from plone.app.blocks.interfaces import DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY
-from plone.app.blocks.interfaces import DEFAULT_SITE_LAYOUT_REGISTRY_KEY
-from plone.app.blocks.interfaces import ILayoutField
-from plone.app.blocks.utils import applyTilePersistent
-from plone.app.blocks.utils import resolveResource
-from plone.autoform.directives import omitted
-from plone.autoform.directives import write_permission
+import json
+import logging
+
+import six
+import zope.deferredimport
+from Acquisition import aq_base, aq_inner, aq_parent
+from lxml import etree, html
+from plone.app.blocks.interfaces import (DEFAULT_AJAX_LAYOUT_REGISTRY_KEY,
+                                         DEFAULT_CONTENT_LAYOUT_REGISTRY_KEY,
+                                         DEFAULT_SITE_LAYOUT_REGISTRY_KEY,
+                                         ILayoutField, _)
+from plone.app.blocks.utils import applyTilePersistent, resolveResource
+# Legacy imports
+from plone.autoform import directives as form
+from plone.autoform.directives import omitted, write_permission
 from plone.autoform.interfaces import IFormFieldProvider
 from plone.jsonserializer.deserializer.converters import schema_compatible
 from plone.jsonserializer.serializer.converters import json_compatible
@@ -22,31 +23,14 @@ from plone.rfc822.interfaces import IPrimaryField
 from plone.supermodel import model
 from plone.supermodel.directives import fieldset
 from plone.tiles.data import defaultTileDataStorage
-from plone.tiles.interfaces import ITile
-from plone.tiles.interfaces import ITileDataStorage
-from plone.tiles.interfaces import ITileType
+from plone.tiles.interfaces import ITile, ITileDataStorage, ITileType
 from repoze.xmliter.utils import getHTMLSerializer
 from zExceptions import NotFound
 from zope import schema
 from zope.annotation.interfaces import IAnnotations
-from zope.component import adapter
-from zope.component import getUtility
-from zope.component import queryUtility
+from zope.component import adapter, getUtility, queryUtility
 from zope.deprecation import deprecate
-from zope.interface import implementer
-from zope.interface import Interface
-from zope.interface import provider
-
-import json
-import logging
-import six
-import zope.deferredimport
-
-# Legacy imports
-from plone.autoform import directives as form
-from plone.supermodel import model
-import logging
-
+from zope.interface import Interface, implementer, provider
 
 logger = logging.getLogger("plone.app.blocks")
 

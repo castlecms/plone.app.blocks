@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-from plone.app.blocks.layoutbehavior import ILayoutAware
-from plone.app.blocks.layoutbehavior import ILayoutBehaviorAdaptable
+from plone.app.blocks.layoutbehavior import (ILayoutAware,
+                                             ILayoutBehaviorAdaptable)
 from Products.CMFCore.utils import getToolByName
-
 
 PROFILE_ID = "profile-plone.app.blocks:default"
 

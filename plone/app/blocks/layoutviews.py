@@ -1,20 +1,19 @@
 # -*- coding: utf-8 -*-
+import os
+
 from plone.app.blocks.interfaces import IBlocksTransformEnabled
 from plone.app.blocks.layoutbehavior import ILayoutAware
 from plone.app.layout.globals.interfaces import IViewView
+from plone.app.theming.utils import theming_policy
 from plone.dexterity.browser.view import DefaultView
 from plone.outputfilters import apply_filters
 from plone.outputfilters.interfaces import IFilter
 from Products.Five import BrowserView
 from Products.Five.browser.pagetemplatefile import ViewPageTemplateFile
 from zope.component import getAdapters
-from zope.interface import alsoProvides
-from zope.interface import implementer
+from zope.interface import alsoProvides, implementer
+
 from castle.cms.theming import renderWithTheme
-from plone.app.theming.utils import theming_policy
-
-import os
-
 
 ERROR_LAYOUT = u"""
 <!DOCTYPE html>

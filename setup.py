@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
-from setuptools import find_packages
-from setuptools import setup
-
 import os
 
+from setuptools import find_packages, setup
 
 version = '5.2.1+castle2.dev0'
 widgets_require = ["plone.app.widgets"]
