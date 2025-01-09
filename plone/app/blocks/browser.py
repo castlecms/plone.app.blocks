@@ -53,9 +53,10 @@ class ContentLayoutView(DefaultView):
         self.layout = self.get_layout()
         policy = theming_policy(self.request)
         settings = policy.getSettings()
-        try:
-            if not settings or settings.rules:
-                return self.index()
-        except AttributeError:
-            pass
+        # Python3 TODO - Some layouts don't renter when run through index()
+        # try:
+        #     if not settings or settings.rules:
+        #         return self.index()
+        # except AttributeError:
+        #     pass
         return renderWithTheme(self.context, self.request, self.layout)
