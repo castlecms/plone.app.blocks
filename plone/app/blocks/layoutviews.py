@@ -65,11 +65,14 @@ class ContentLayoutView(DefaultView):
 
         policy = theming_policy(self.request)
         settings = policy.getSettings()
-        try:
-            if not settings or settings.rules:
-                return self.index()
-        except AttributeError:
-            pass
+
+        # Python3 TODO - The below block is left over from the old Blocks, but throws a template error when run
+        # Need to determine if this is still necessary
+        # try:
+        #     if not settings or settings.rules:
+        #         return self.index()
+        # except AttributeError:
+        #     pass
         return renderWithTheme(self.context, self.request, result)
 
 

@@ -161,14 +161,19 @@ class LayoutAwareDefault(object):
 
     def content_layout(self):
         """Returns the content HTML layout."""
-        path = self.content_layout_path()
-        try:
-            resolved = resolveResource(path)
-            if isinstance(resolved, six.text_type):
-                resolved = resolved.encode("utf-8")
-            return applyTilePersistent(path, resolved)
-        except (NotFound, RuntimeError, IOError):
-            pass
+        if self.contentLayout:
+            try:
+                path = self.content_layout_path()
+                resolved = resolveResource(path)
+                if isinstance(resolved, six.text_type):
+                    resolved = resolved.encode("utf-8")
+                return applyTilePersistent(path, resolved)
+            except (NotFound, RuntimeError, IOError):
+                pass
+
+        # Layout resides on 'content' property instead
+        return self.content
+
 
     def site_layout(self):
         """Bubble up looking for an sectionSiteLayout, otherwise lookup the
