@@ -1,13 +1,17 @@
 # -*- coding: utf-8 -*-
+import logging
 import re
 
 from lxml import etree, html
 from OFS.Image import File
 from plone.app.blocks import gridsystem
 from plone.transformchain.interfaces import ITransform
+from Products.CMFPlone.utils import safe_bytes
 from repoze.xmliter.serializer import XMLSerializer
 from repoze.xmliter.utils import getHTMLSerializer
 from zope.interface import implementer
+
+logger = logging.getLogger(__name__)
 
 
 @implementer(ITransform)
@@ -30,7 +34,7 @@ class ParseXML(object):
         self.published = published
         self.request = request
 
-    def transformString(self, result, encoding):
+    def transformBytes(self, result, encoding):
         return self.transformIterable([result], encoding)
 
     def transformUnicode(self, result, encoding):
@@ -60,17 +64,25 @@ class ParseXML(object):
         try:
             # Fix layouts with CR[+LF] line endings not to lose their heads
             # (this has been seen with downloaded themes with CR[+LF] endings)
-            iterable = [re.sub('&#13;', '\n', re.sub('&#13;\n', '\n', item))
-                        for item in result if item]
+            # The html serializer much prefers only bytes, no unicode/text,
+            # and it return a serializer that returns bytes.
+            # So we start with ensuring all items in the iterable are bytes.
+            iterable = [
+                re.sub(b"&#13;", b"\n", re.sub(b"&#13;\n", b"\n", safe_bytes(item)))
+                for item in result
+                if item
+            ]
             result = getHTMLSerializer(
-                iterable, pretty_print=self.pretty_print, encoding=encoding)
+                iterable, pretty_print=self.pretty_print, encoding=encoding
+            )
             # Fix XHTML layouts with where etree.tostring breaks <![CDATA[
-            if any(['<![CDATA[' in item for item in iterable]):
+            if any([b"<![CDATA[" in item for item in iterable]):
                 result.serializer = html.tostring
-            self.request['plone.app.blocks.enabled'] = True
+
+            self.request["plone.app.blocks.enabled"] = True
             return result
-        except (AttributeError, TypeError, etree.ParseError):
-            return None
+        except (AttributeError, TypeError, etree.ParseError) as e:
+            logger.error(e)
 
 
 @implementer(ITransform)
