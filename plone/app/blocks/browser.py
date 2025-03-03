@@ -53,10 +53,9 @@ class ContentLayoutView(DefaultView):
         self.layout = self.get_layout()
         policy = theming_policy(self.request)
         settings = policy.getSettings()
-        # Python3 TODO - Some layouts don't render when run through index(). Not sure if still needed?
-        # try:
-        #     if not settings or settings.rules:
-        #         return self.index()
-        # except AttributeError:
-        #     pass
+        try:
+            if not settings or settings.rules:
+                return self.index()
+        except AttributeError:
+            pass
         return renderWithTheme(self.context, self.request, self.layout)
