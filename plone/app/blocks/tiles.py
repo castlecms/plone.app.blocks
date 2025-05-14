@@ -6,6 +6,7 @@ from lxml import html
 from plone import api
 from plone.app.blocks import formparser
 from plone.app.blocks import utils
+from plone.app.redirector.interfaces import IRedirectionStorage
 from plone.tiles import data as tiles_data
 from plone.tiles.interfaces import ITile
 from plone.tiles.interfaces import ITileDataManager
@@ -15,6 +16,7 @@ from zExceptions import NotFound
 from zope.component import adapter
 from zope.component import ComponentLookupError
 from zope.component import getMultiAdapter
+from zope.component import getUtility
 from zope.interface import implementer
 from zope.schema import getFields
 
@@ -133,7 +135,13 @@ def _renderTile(request, node, contexts, baseURL, siteUrl, site, sm):
         contextPath, tilePart = relHref.split('@@', 1)
         contextPath = unquote(contextPath.strip('/'))
         if contextPath not in contexts:
-            ob = site.unrestrictedTraverse(contextPath)
+            try:
+                ob = site.unrestrictedTraverse(contextPath)
+            except KeyError:
+                redirector = getUtility(IRedirectionStorage, context=site)
+                old_path = '/'.join(site.getPhysicalPath()) + '/' + contextPath
+                new_path = redirector.get(old_path)
+                ob = site.unrestrictedTraverse(new_path, None)
             if not sm.checkPermission('View', ob):
                 # manually check perms. We do not want restriction
                 # on traversing through an object
