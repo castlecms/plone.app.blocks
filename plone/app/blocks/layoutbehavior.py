@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from hashlib import md5
+import hashlib
 import logging
 
 from lxml import html
@@ -83,7 +83,15 @@ alsoProvides(ILayoutAware['pageSiteLayout'], IOmittedField)
 alsoProvides(ILayoutAware['sectionSiteLayout'], IOmittedField)
 
 
-@cache(lambda fun, path, resolved: md5(resolved).hexdigest())
+def md5_fips(data):
+    try:
+        return hashlib.new('md5', data, usedforsecurity=False)
+    except TypeError:
+        # in case FIPS is not supported
+        return hashlib.md5(data)
+
+
+@cache(lambda fun, path, resolved: md5_fips(resolved).hexdigest())
 def applyTilePersistent(path, resolved):
     """Append X-Tile-Persistent into resolved layout's tile URLs to allow
     context specific tile configuration overrides.
